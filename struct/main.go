@@ -25,8 +25,8 @@ func main() {
 	}
 
 	//multi line stucts , commas
-	jimPointer := &jim
-	jimPointer.updateName("jimmy")
+	
+	jim.updateName("jimmy")
 
 	jim.print()
 
