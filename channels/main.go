@@ -17,14 +17,22 @@ func main() {
 
 	c := make(chan string)
 
+
+	//we only use the go key word in front of a fn call.
+
 	for _, link := range links {
 		go checkLink(link, c)
 
 	}
 
-	fmt.Println(<- c)
+	for i := 0; i < len(links); i++ {
+		fmt.Println(<-c)
+	}
 
-	//we only use the go key word in front of a fn call.
+
+	//a value coming from chan is a blocking call
+
+
 
 }
 
