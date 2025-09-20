@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -25,15 +26,23 @@ func main() {
 
 	}
 
-	for i := 0; i < len(links); i++ {
-		fmt.Println(<-c)
+	//infinite loop, l -> fn literal
+	for l := range c {
+
+		go func(link string) {
+			time.Sleep(5 * time.Second)
+			checkLink(link, c)
+		}(l)
 	}
 
 
 	//a value coming from chan is a blocking call
 
+	//most of the time the main rouine should not be put to sleep
 
 
+   //In practice, we never ever try to reference the same variable inside of
+   //two different routines
 }
 
 func checkLink(link string, c chan string) {
@@ -42,11 +51,11 @@ func checkLink(link string, c chan string) {
 	if err != nil {
 		fmt.Println(link, "might be down!")
 
-		c <- "Might be down I think"
+		c <- link
 		return
 	}
 
 	fmt.Println(link, "is up!")
 
-	c <- "Yup it's up"
+	c <- link
 }
