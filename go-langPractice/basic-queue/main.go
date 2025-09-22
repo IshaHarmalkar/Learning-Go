@@ -1,61 +1,51 @@
 package main
 
-import (
-	"fmt"
-)
-
-//enque, dequeu, front, rear
-
-type queue []int
-
-
+import "fmt"
 
 func main() {
-     
-	q := newQueue()
 
-	fmt.Println("Queue Created", q)
+	var queue = make([]int, 0)
 
-	q.enque(5)
-	q.dequeu()
+	queue = enqueue(queue, 10)
+	fmt.Println("After pushing 10 ", queue)
 
-	fmt.Print("Element at firt pos in queue is" ,q.first())
-	fmt.Println("The last ele in queue is", q.rear())
 
-	fmt.Println("Modified Queue", q)
+	queue = enqueue(queue, 20)
+	fmt.Println("After pushing 20 ", queue)
 
+
+	queue = enqueue(queue, 30)
+	fmt.Println("After pushing 20 ", queue)
+
+
+	ele, queue := deque(queue)
+	fmt.Println("Queue after removing", ele,  " :", queue)
+
+	queue = enqueue(queue, 40)
+	fmt.Println("After pushing 40 ", queue)
 
 }
 
-func newQueue() queue {
-	q := queue{1, 2, 3, 4}
-	return q
+func enqueue(queue []int, element int) []int {
+
+	queue = append(queue, element) //append to q
+	fmt.Println("Enqueued:", element)
+
+	return queue
 
 }
 
 
-func (q *queue) enque(e int) {
-	*q = append(*q, e)
+func deque(queue []int) (int, []int) {
+
+	element := queue[0]
 
 	
-}
+	if len(queue) == 1 {
+		var tmp = []int{}
+		return element, tmp
+	}
 
-func (q *queue) dequeu() int{
-
-	ele := (*q)[0]
-	*q = (*q)[1:]
-
-	return ele
+	return element, queue[1:]   //slice off the element once it is dequeued
 
 }
-
-func (q queue) first() int {
-	return q[0]
-}
-
-
-func (q queue) rear() int {
-	return q[len(q) - 1]
-}
-
-
