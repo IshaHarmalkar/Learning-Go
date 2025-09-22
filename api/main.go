@@ -56,7 +56,7 @@ func makeRequest(apiUrl, token string) (*http.Response, error){
 
 	//add headers
 
-	req.Header.Set("Authorization", "Bearer " +token)
+	req.Header.Set("Authorization", token)
 	req.Header.Set("Accept", "application/json")
 
 
