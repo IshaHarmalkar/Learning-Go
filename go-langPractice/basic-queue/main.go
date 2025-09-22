@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 //enque, dequeu, front, rear
 
@@ -32,15 +34,16 @@ func newQueue() queue {
 }
 
 
-func (q queue) enque(e int){
+func (q *queue) enque(e int) {
+	*q = append(*q, e)
 
-	q = append(q, e)
+	
 }
 
-func (q queue) dequeu() int {
+func (q *queue) dequeu() int{
 
-	ele := q[0]
-	q = q[1:]
+	ele := (*q)[0]
+	*q = (*q)[1:]
 
 	return ele
 
