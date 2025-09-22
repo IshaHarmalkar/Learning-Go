@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 type Shape interface {
@@ -47,33 +48,31 @@ func main() {
 
 
 
-	mysteryBox := interface{}(10) 
-	describeValue(mysteryBox)
-
-
-	retrivedInt, ok := mysteryBox.(string) 
-
-	if ok{
-		fmt.Println("Retrived int:", retrivedInt)
-	} else{
-		fmt.Println("value is not an integer")
-	}
-
-
-
-
-
-
 }
 
-//can accept anytime
-func describeValue(t interface{}){
-
-	fmt.Printf("Type: %T, Value: %v\n", t, t)
-
+type CalculationError struct {
+	msg string
 }
+
 
 func (r Rectangle) Area() float64 {
 	return r.height * r.width
 }
+
+
+func (ce CalculationError) Error() string{
+	return ce.msg
+}
+
+
+
+func performCaluclation(val float64) (float64, error){
+	if  val < 0 {
+		return 0 ,CalculationError{
+			msg: "Invalid Input",
+		}
+	}
+
+	return math.Sqrt(val), nil
+} 
 
