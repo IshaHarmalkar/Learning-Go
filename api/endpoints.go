@@ -1,71 +1,54 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
-	"time"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
-type User struct {
-	Name  string	
+
+
+
+
+type Payload struct {
+	Pagination Pagination `json:"pagination"`
 }
 
-func makePostRequest(url, token string, payload interface{}) (*http.Response, error) {
-	//convert payload to json
-	data, err := json.Marshal(payload); 
 
-	if err != nil{
-		return nil, fmt.Errorf("failed to marshal payload: %w", err)
-	}
+type Pagination struct {
+	Page    int `json:"page"`
+	PerPage int `json:"perPage"`
+}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+
+func getSites(){
+
+	err := godotenv.Load()
 
 	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
+		log.Fatal("Error loading .env file")
 	}
 
-	//Add headers
+	token := os.Getenv("JWT_TOKEN")
 
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
+	getSitesUrl := os.Getenv("POST_SITES")
+
+	payload := Payload{
+		Pagination: Pagination{
+			Page:    1,
+			PerPage: 40,
+		},
+	}
 
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	return client.Do(req)
-}
-
-
-
-/* func makeGetRequest(url, token string) (*http.Response, error){
-	req, err := http.NewRequest("GET", url, nil)
+	resp, err := makeRequest("POST", getSitesUrl, token, payload)
 	if err != nil{
-		return nil, fmt.Errorf("error creating request: %w", err)
+		fmt.Println("error in making request")
+
 	}
+	handleResponse(resp)
 
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Accept", "application/json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	return client.Do(req)
-} */
-
-
-func handleResponse(resp *http.Response){
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		log.Fatalf("Error reading response: %v", err)
-	}
-
-	fmt.Printf("Status: %s\n", resp.Status)
-	fmt.Printf("Response Body: \n%s\n", string(body))
-
-	
 }
+
