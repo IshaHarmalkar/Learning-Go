@@ -2,27 +2,36 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"strings"
 )
 
 func main() {
+	strReader := strings.NewReader("Hellow Go Reader!")
 
+	data, err := io.ReadAll(strReader)
 	
-	
-	r := strings.NewReader("hello world")
-
-	
-
-
-	buf := make([]byte, 5) 
-
-
-	for{n, err := r.Read(buf)
-		if err != nil{
-			break
-		}
-
-		fmt.Println(string(buf[:n]))
+	if err != nil {
+		print(err)
 	}
 
+	fmt.Println(string(data))
 }
+
+
+/* 
+strReader := strings.NewReader("Hello Go Reader!")
+
+Creates a *strings.Reader (concrete type).
+
+Implements io.Reader.
+
+data, err := io.ReadAll(strReader)
+
+io.ReadAll is a built-in Go function.
+
+Takes any io.Reader and reads all bytes until EOF.
+
+fmt.Println(string(data))
+
+Prints the string. */
