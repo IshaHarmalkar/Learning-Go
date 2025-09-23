@@ -15,15 +15,16 @@ type Pagination struct {
 	PerPage int `json:"perPage"`
 }
 
-
 type Filters struct {
-	Search *string `json:"search"`
+    Search   *string  `json:"search,omitempty"`
+    UserType []string `json:"userType,omitempty"`
+    Terms    []string `json:"terms,omitempty"`
+    Sites    []string `json:"sites,omitempty"`
 }
-
 
 type Payload struct {
 	Pagination Pagination `json:"pagination"`
-	Filters    *Filters   `json:"filters,omitempty"`
+	Filters    Filters   `json:"filters,omitempty"`
 }
 
 type User struct {
@@ -78,16 +79,14 @@ func getAccessPoint(){
 	var search *string = nil
 
 	payload := Payload{
-	Pagination: Pagination{
-		Page:    1,
-		PerPage: 40,
-	},
-	Filters: &Filters{
-		Search: search,
-	},
-}
-
-
+        Pagination: Pagination{
+            Page:    1,
+            PerPage: 40,
+        },
+        Filters: Filters{
+            Search: search,
+        },
+    }
 
 	resp, err := makeRequest("POST", getSitesUrl, token, payload)
 	if err != nil{
@@ -156,36 +155,36 @@ func createUser(){
 
 
 
-// func fetchAllOrgUsers(){
+func fetchAllOrgUsers(){
 
-// 	err := godotenv.Load()
+	err := godotenv.Load()
 
-// 	if err != nil {
-// 		log.Fatal("Error loading .env file")
-// 	}
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-// 	name := "James Watson"
-// 	token := os.Getenv("JWT_TOKEN")
+	
+	token := os.Getenv("JWT_TOKEN")
 
-// 	Url := os.Getenv("POST_ALL_USERS")
+	Url := os.Getenv("POST_ALL_USERS")
 
-// 	payload := Payload{
-//         Pagination: Pagination{
-//             Page:    1,
-//             PerPage: 25,
-//         },
-//         Filters: Filters{
-//             UserType: []string{"active"},
-//             Terms:    []string{},
-//             Sites:    []string{},
-//         },
-//     }
+	payload := Payload{
+        Pagination: Pagination{
+            Page:    1,
+            PerPage: 25,
+        },
+        Filters: Filters{
+            UserType: []string{"active"},
+            Terms:    []string{},
+            Sites:    []string{},
+        },
+    }
 
-// 	resp, err := makeRequest("POST", Url, token, payload)
-// 	if err != nil{
-// 		fmt.Printf("error in making request: %v\n", err)
-// 		return // Don't continue if there's an error
-// 	}
-// 	handleResponse(resp)
+	resp, err := makeRequest("POST", Url, token, payload)
+	if err != nil{
+		fmt.Printf("error in making request: %v\n", err)
+		return // Don't continue if there's an error
+	}
+	handleResponse(resp)
 
-// }
+}
