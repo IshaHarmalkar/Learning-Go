@@ -7,21 +7,22 @@ func main() {
 	/* fmt.Println("Get Sites")
 	getSites()
 
-
 	fmt.Println("Get Access Points")
 	getAccessPoint()
 
 	fmt.Println("Get Roles")
-	getRoles() */
+	getRoles()
 
-	// fmt.Println("Create user")
-	// createUser()
+	fmt.Println("Create user")
+	createUser()
 
-	// fmt.Println("Fetch all organisation users")
-	// fetchAllOrgUsers()
-
+	fmt.Println("Fetch all organisation users")
+	fetchAllOrgUsers()
 
 	fmt.Println("Get user permission")
-	getUserPermission()
+	getUserPermission() */
+
+	fmt.Println("Deactivate user")
+	deactivateUsers()
 
 }

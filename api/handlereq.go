@@ -36,6 +36,7 @@ func makeRequest(method, url, token string, payload interface{}) (*http.Response
 		body = bytes.NewBuffer(data)
 	}
 
+	fmt.Println(payload)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -34,6 +35,16 @@ type User struct {
 type SitesPayload struct {
     Sites []string `json:"sites"`
 }
+
+type UserDeactivation struct {
+    ID             int  `json:"id"`
+    DeactivateUser bool `json:"deactivateUser"`
+}
+
+type DeactivationPayload struct {
+    Users []UserDeactivation `json:"users"`
+}
+
 
 
 func getSites(){
@@ -215,6 +226,52 @@ func getUserPermission(){
     }
 
 	resp, err := makeRequest("POST", Url, token, payload)
+	if err != nil{
+		fmt.Printf("error in making request: %v\n", err)
+		return 
+	}
+	handleResponse(resp)
+
+}
+
+
+func deactivateUsers(){
+
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	type UserDeactivation struct {
+        ID             int  `json:"id"`
+        DeactivateUser bool `json:"deactivateUser"`
+    }
+
+    type DeactivationPayload struct {
+        Users []UserDeactivation `json:"users"`
+    }
+	userID := os.Getenv("USER_ID")
+	fmt.Println(userID)
+
+	id, err := strconv.Atoi(userID) 
+    if err != nil {
+        log.Fatalf("Invalid USER_ID: %v", err)
+    }
+
+    payload := DeactivationPayload{
+        Users: []UserDeactivation{
+            {
+                ID: id,
+                DeactivateUser: true,
+            },
+        },
+    }
+	
+	token := os.Getenv("JWT_TOKEN")
+	Url := os.Getenv("DEACTIVATE_USER")
+
+	resp, err := makeRequest("PATCH", Url, token, payload)
 	if err != nil{
 		fmt.Printf("error in making request: %v\n", err)
 		return 
