@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 
-	/* fmt.Println("Get Sites")
+	fmt.Println("Get Sites")
 	getSites()
 
 	fmt.Println("Get Access Points")
@@ -33,13 +33,11 @@ func main() {
 
 
 	fmt.Println("Delete User")
-	deleteUser() */
+	deleteUser()
 
 
-	// fmt.Println("Create user")
-	// createUser()
+	fmt.Println("Create user")
+	createUser()
 
-	fmt.Println("test")
-	getSites()
-
+	
 }

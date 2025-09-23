@@ -128,7 +128,33 @@ func getAccessPoint(){
 
 	token := os.Getenv("JWT_TOKEN")
 
-	getSitesUrl := os.Getenv("POST_ACCESS_POINTS")
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    orgId = strings.TrimSpace(orgId)
+
+	fmt.Print("Enter the site ID: ")
+    reader = bufio.NewReader(os.Stdin)
+    siteId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    siteId = strings.TrimSpace(siteId)
+
+	url := os.Getenv("BASE_URL")
+	url = url + "/organisationManagement/v1/integrator/organisations/" + orgId+ "/sites/" + siteId + "/accessPoints/list"
+
+
+
+
+
 
 	var search *string = nil
 
@@ -142,7 +168,7 @@ func getAccessPoint(){
         },
     }
 
-	resp, err := makeRequest("POST", getSitesUrl, token, payload)
+	resp, err := makeRequest("POST", url, token, payload)
 	if err != nil{
 		fmt.Println("error in making request")
 
@@ -163,13 +189,24 @@ func getRoles(){
 
 	token := os.Getenv("JWT_TOKEN")
 
-	getSitesUrl := os.Getenv("GET_ROLES")
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    orgId = strings.TrimSpace(orgId)
+
+	url := os.Getenv("GET_ROLES")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/formData?roles=roles"
 
 	
 	
 
 
-	resp, err := makeRequest("GET", getSitesUrl, token, nil)
+	resp, err := makeRequest("GET", url, token, nil)
 	if err != nil{
 		fmt.Println("error in making request")
 
@@ -187,8 +224,18 @@ func createUser(){
 		log.Fatal("Error loading .env file")
 	}
 
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+
+
+
 	fmt.Println("Enter the user's name: ")
-	reader := bufio.NewReader(os.Stdin)
+	reader = bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatalf("Error reading name: %v", err)
@@ -199,13 +246,19 @@ func createUser(){
 	
 	token := os.Getenv("JWT_TOKEN")
 
-	Url := os.Getenv("CREATE_USER")
+	
+
+	url:= os.Getenv("BASE_URL")
+
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId +"/users/create"
+
+	
 
 	payload := User{
 		Name: &name,
 	}
 
-	resp, err := makeRequest("POST", Url, token, payload)
+	resp, err := makeRequest("POST", url, token, payload)
 	if err != nil{
 		fmt.Printf("error in making request: %v\n", err)
 		return // Don't continue if there's an error
@@ -229,7 +282,17 @@ func fetchAllOrgUsers(){
 	
 	token := os.Getenv("JWT_TOKEN")
 
-	Url := os.Getenv("POST_ALL_USERS")
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+
+
+	url := os.Getenv("BASE_URL")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/users"
 
 	payload := Payload{
         Pagination: Pagination{
@@ -243,7 +306,7 @@ func fetchAllOrgUsers(){
         },
     }
 
-	resp, err := makeRequest("POST", Url, token, payload)
+	resp, err := makeRequest("POST", url, token, payload)
 	if err != nil{
 		fmt.Printf("error in making request: %v\n", err)
 		return 
@@ -267,13 +330,32 @@ func getUserPermission(){
 	
 	token := os.Getenv("JWT_TOKEN")
 
-	Url := os.Getenv("POST_USER_PERMISSION")
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+
+	fmt.Print("Enter the user ID to fetch permission of: ")
+    reader = bufio.NewReader(os.Stdin)
+    userId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    userId = strings.TrimSpace(userId)
+
+	url := os.Getenv("BASE_URL")
+
+	url = url + "/accessManagementV3/integrator/v1/organisations/" + orgId+"/users/" + userId + "/permissions"
+	fmt.Println(url)
 
 	 payload := SitesPayload{
         Sites: []string{}, // An empty slice of strings
     }
 
-	resp, err := makeRequest("POST", Url, token, payload)
+	resp, err := makeRequest("POST", url, token, payload)
 	if err != nil{
 		fmt.Printf("error in making request: %v\n", err)
 		return 
@@ -285,7 +367,7 @@ func getUserPermission(){
 
 
 
-func deactivateUsers() {
+func deactivateUser() {
     err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file")
@@ -300,11 +382,20 @@ func deactivateUsers() {
         Users []UserDeactivation `json:"users"`
     }
 
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+
+
  
     fmt.Print("Enter the user ID to deactivate: ")
 
 
-    reader := bufio.NewReader(os.Stdin)
+    reader = bufio.NewReader(os.Stdin)
     input, err := reader.ReadString('\n')
     if err != nil {
         log.Fatalf("Error reading input: %v", err)
@@ -329,7 +420,8 @@ func deactivateUsers() {
     
   
     token := os.Getenv("JWT_TOKEN")
-    url := os.Getenv("DEACTIVATE_USER")
+    url := os.Getenv("BASE_URL")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/users/update"
 
     resp, err := makeRequest("PATCH", url, token, payload)
     if err != nil {
@@ -340,7 +432,7 @@ func deactivateUsers() {
 }
 
 
-func activateUsers() {
+func activateUser() {
     err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file")
@@ -355,11 +447,18 @@ func activateUsers() {
         Users []UserDeactivation `json:"users"`
     }
 
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
  
     fmt.Print("Enter the user ID to activate: ")
 
 
-    reader := bufio.NewReader(os.Stdin)
+    reader = bufio.NewReader(os.Stdin)
     input, err := reader.ReadString('\n')
     if err != nil {
         log.Fatalf("Error reading input: %v", err)
@@ -384,7 +483,9 @@ func activateUsers() {
     
   
     token := os.Getenv("JWT_TOKEN")
-    url := os.Getenv("ACTIVATE_USER")
+    url := os.Getenv("BASE_URL")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/users/update"
+
 
     resp, err := makeRequest("PATCH", url, token, payload)
     if err != nil {
@@ -406,9 +507,18 @@ func updateUsers() {
         log.Fatal("Error loading .env file")
     }
 
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+ 
+
     // Prompt for user ID
     fmt.Print("Enter the user ID to update: ")
-    reader := bufio.NewReader(os.Stdin)
+    reader = bufio.NewReader(os.Stdin)
     inputID, err := reader.ReadString('\n')
     if err != nil {
         log.Fatalf("Error reading ID: %v", err)
@@ -448,7 +558,9 @@ func updateUsers() {
 
     // Get auth token and URL from env
     token := os.Getenv("JWT_TOKEN")
-    url := os.Getenv("UPDATE_USER")
+    url := os.Getenv("BASE_URL")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/users/update"
+
 
     // Make the request
     resp, err := makeRequest("PATCH", url, token, payload)
@@ -468,10 +580,20 @@ func deleteUser(){
         log.Fatal("Error loading .env file")
     }
 
+	fmt.Print("Enter the organisation ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    orgId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }    
+    orgId = strings.TrimSpace(orgId)
+
 	fmt.Println("Enter the user ID to delete: ")
-	reader := bufio.NewReader(os.Stdin)
+	reader = bufio.NewReader(os.Stdin)
 
 	inputId, err := reader.ReadString('\n')
+
+	
 
 	if err != nil {
 		log.Fatalf("Error reading ID: %v", err)
@@ -487,8 +609,9 @@ func deleteUser(){
 	}
 
 	token := os.Getenv("JWT_TOKEN")
-	url := os.Getenv("DELETE_USER")
-	fmt.Println(url)
+	url := os.Getenv("BASE_URL")
+	url = url + "/userManagement/integrator/v1/organisations/" + orgId + "/users/delete"
+	
 
 
 	resp, err := makeRequest("POST", url, token, payload)
