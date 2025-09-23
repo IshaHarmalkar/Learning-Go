@@ -22,10 +22,13 @@ func main() {
 	fmt.Println("Get user permission")
 	getUserPermission() */
 
-	// fmt.Println("Deactivate user")
-	// deactivateUsers()
+/* 	fmt.Println("Deactivate user")
+	deactivateUsers()
 
 	fmt.Println("Activate user")
 	activateUsers()
+ */
+	fmt.Println("Update User")
+	updateUsers()
 
 }

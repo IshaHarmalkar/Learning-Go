@@ -47,6 +47,25 @@ type DeactivationPayload struct {
     Users []UserDeactivation `json:"users"`
 }
 
+type UserUpdate struct {
+    ID              int       `json:"id"`
+    AccessExpiresAt *string   `json:"accessExpiresAt,omitempty"`
+    EmployeeCode    *string   `json:"employeeCode,omitempty"`
+    Name            *string   `json:"name,omitempty"`
+    Email           *string   `json:"email,omitempty"`
+    ReportingTo     *string   `json:"reportingTo,omitempty"`
+    HomeSiteID      *int      `json:"homeSiteId,omitempty"`
+    AdminOfSites    []int     `json:"adminOfSites,omitempty"`
+    Roles           []string  `json:"roles,omitempty"`
+    Terms           []string  `json:"terms,omitempty"`
+    JoiningDate     *string   `json:"joiningDate,omitempty"`
+    Attributes      []string  `json:"attributes,omitempty"`
+}
+
+type UpdateUsersPayload struct {
+    Users []UserUpdate `json:"users"`
+}
+
 
 
 func getSites(){
@@ -340,6 +359,71 @@ func activateUsers() {
     token := os.Getenv("JWT_TOKEN")
     url := os.Getenv("ACTIVATE_USER")
 
+    resp, err := makeRequest("PATCH", url, token, payload)
+    if err != nil {
+        fmt.Printf("Error in making request: %v\n", err)
+        return
+    }
+    handleResponse(resp)
+}
+
+
+
+func stringPtr(s string) *string {
+    return &s
+}
+
+func updateUsers() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+    // Prompt for user ID
+    fmt.Print("Enter the user ID to update: ")
+    reader := bufio.NewReader(os.Stdin)
+    inputID, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading ID: %v", err)
+    }
+    id, err := strconv.Atoi(strings.TrimSpace(inputID))
+    if err != nil {
+        log.Fatalf("Invalid ID: %v", err)
+    }
+
+    // Prompt for user's name
+    fmt.Print("Enter the user's name: ")
+    inputName, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading name: %v", err)
+    }
+    name := strings.TrimSpace(inputName)
+
+    // Prompt for user's email
+    fmt.Print("Enter the user's email: ")
+    inputEmail, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading email: %v", err)
+    }
+    email := strings.TrimSpace(inputEmail)
+
+    // Create the payload
+    payload := UpdateUsersPayload{
+        Users: []UserUpdate{
+            {
+                ID:    id,
+                Name:  stringPtr(name),
+                Email: stringPtr(email),
+                // Other fields are omitted due to omitempty
+            },
+        },
+    }
+
+    // Get auth token and URL from env
+    token := os.Getenv("JWT_TOKEN")
+    url := os.Getenv("UPDATE_USER")
+
+    // Make the request
     resp, err := makeRequest("PATCH", url, token, payload)
     if err != nil {
         fmt.Printf("Error in making request: %v\n", err)
