@@ -66,6 +66,10 @@ type UpdateUsersPayload struct {
     Users []UserUpdate `json:"users"`
 }
 
+type DeleteUsersPayload struct {
+    UserIDs []int `json:"userIds"`
+}
+
 
 
 func getSites(){
@@ -430,4 +434,47 @@ func updateUsers() {
         return
     }
     handleResponse(resp)
+}
+
+
+
+func deleteUser(){
+
+	err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+	fmt.Println("Enter the user ID to delete: ")
+	reader := bufio.NewReader(os.Stdin)
+
+	inputId, err := reader.ReadString('\n')
+
+	if err != nil {
+		log.Fatalf("Error reading ID: %v", err)
+	}
+
+	id, err := strconv.Atoi(strings.TrimSpace(inputId))
+	if err != nil {
+		log.Fatalf("Invalid ID: Please enter a valid number. Error: %v", err)
+	}
+
+	payload := DeleteUsersPayload{
+		UserIDs: []int{id},
+	}
+
+	token := os.Getenv("JWT_TOKEN")
+	url := os.Getenv("DELETE_USER")
+	fmt.Println(url)
+
+
+	resp, err := makeRequest("POST", url, token, payload)
+
+	if err != nil {
+		fmt.Printf("Error in making request: %v\n", err)
+		return
+	}
+
+	handleResponse(resp)
+
 }

@@ -28,7 +28,11 @@ func main() {
 	fmt.Println("Activate user")
 	activateUsers()
  */
-	fmt.Println("Update User")
-	updateUsers()
+	// fmt.Println("Update User")
+	// updateUsers()
+
+
+	fmt.Println("Delete User")
+	deleteUser()
 
 }
