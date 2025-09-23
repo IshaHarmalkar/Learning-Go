@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 
-	fmt.Println("Get Sites")
+	/* fmt.Println("Get Sites")
 	getSites()
 
 
@@ -12,13 +12,16 @@ func main() {
 	getAccessPoint()
 
 	fmt.Println("Get Roles")
-	getRoles()
+	getRoles() */
 
 	// fmt.Println("Create user")
 	// createUser()
 
-	fmt.Println("Fetch all organisation users")
-	fetchAllOrgUsers()
+	// fmt.Println("Fetch all organisation users")
+	// fetchAllOrgUsers()
 
+
+	fmt.Println("Get user permission")
+	getUserPermission()
 
 }

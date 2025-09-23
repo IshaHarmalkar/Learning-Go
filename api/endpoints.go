@@ -31,6 +31,10 @@ type User struct {
     Name  *string  `json:"name"`
 }
 
+type SitesPayload struct {
+    Sites []string `json:"sites"`
+}
+
 
 func getSites(){
 
@@ -183,7 +187,37 @@ func fetchAllOrgUsers(){
 	resp, err := makeRequest("POST", Url, token, payload)
 	if err != nil{
 		fmt.Printf("error in making request: %v\n", err)
-		return // Don't continue if there's an error
+		return 
+	}
+	handleResponse(resp)
+
+}
+
+
+
+
+
+func getUserPermission(){
+
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	
+	token := os.Getenv("JWT_TOKEN")
+
+	Url := os.Getenv("POST_USER_PERMISSION")
+
+	 payload := SitesPayload{
+        Sites: []string{}, // An empty slice of strings
+    }
+
+	resp, err := makeRequest("POST", Url, token, payload)
+	if err != nil{
+		fmt.Printf("error in making request: %v\n", err)
+		return 
 	}
 	handleResponse(resp)
 
