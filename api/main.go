@@ -20,19 +20,26 @@ func main() {
 	fetchAllOrgUsers()
 
 	fmt.Println("Get user permission")
-	getUserPermission() */
+	getUserPermission()
 
-/* 	fmt.Println("Deactivate user")
+	fmt.Println("Deactivate user")
 	deactivateUsers()
 
 	fmt.Println("Activate user")
 	activateUsers()
- */
-	// fmt.Println("Update User")
-	// updateUsers()
+
+	fmt.Println("Update User")
+	updateUsers()
 
 
 	fmt.Println("Delete User")
-	deleteUser()
+	deleteUser() */
+
+
+	// fmt.Println("Create user")
+	// createUser()
+
+	fmt.Println("test")
+	getSites()
 
 }

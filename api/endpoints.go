@@ -82,7 +82,21 @@ func getSites(){
 
 	token := os.Getenv("JWT_TOKEN")
 
-	getSitesUrl := os.Getenv("POST_SITES")
+	fmt.Print("Enter the site ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    siteId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    siteId = strings.TrimSpace(siteId)
+
+	getSitesUrl := os.Getenv("BASE_URL")
+	getSitesUrl = getSitesUrl + "/organisationManagement/v2/integrator/organisations/" + siteId+ "/sites"
+
+
+
 
 	payload := Payload{
 		Pagination: Pagination{
@@ -173,7 +187,16 @@ func createUser(){
 		log.Fatal("Error loading .env file")
 	}
 
-	name := "James Watson"
+	fmt.Println("Enter the user's name: ")
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatalf("Error reading name: %v", err)
+	}
+
+	name := strings.TrimSpace(input)
+
+	
 	token := os.Getenv("JWT_TOKEN")
 
 	Url := os.Getenv("CREATE_USER")
