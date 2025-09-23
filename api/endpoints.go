@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -235,15 +237,15 @@ func getUserPermission(){
 }
 
 
-func deactivateUsers(){
 
-	err := godotenv.Load()
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+func deactivateUsers() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
 
-	type UserDeactivation struct {
+    type UserDeactivation struct {
         ID             int  `json:"id"`
         DeactivateUser bool `json:"deactivateUser"`
     }
@@ -251,31 +253,42 @@ func deactivateUsers(){
     type DeactivationPayload struct {
         Users []UserDeactivation `json:"users"`
     }
-	userID := os.Getenv("USER_ID")
-	fmt.Println(userID)
 
-	id, err := strconv.Atoi(userID) 
+ 
+    fmt.Print("Enter the user ID to deactivate: ")
+
+
+    reader := bufio.NewReader(os.Stdin)
+    input, err := reader.ReadString('\n')
     if err != nil {
-        log.Fatalf("Invalid USER_ID: %v", err)
+        log.Fatalf("Error reading input: %v", err)
     }
 
+    
+    trimmedInput := strings.TrimSpace(input)
+    id, err := strconv.Atoi(trimmedInput)
+    if err != nil {
+        log.Fatalf("Invalid input: Please enter a valid number. Error: %v", err)
+    }
+
+  
     payload := DeactivationPayload{
         Users: []UserDeactivation{
             {
-                ID: id,
+                ID:             id,
                 DeactivateUser: true,
             },
         },
     }
-	
-	token := os.Getenv("JWT_TOKEN")
-	Url := os.Getenv("DEACTIVATE_USER")
+    
+  
+    token := os.Getenv("JWT_TOKEN")
+    url := os.Getenv("DEACTIVATE_USER")
 
-	resp, err := makeRequest("PATCH", Url, token, payload)
-	if err != nil{
-		fmt.Printf("error in making request: %v\n", err)
-		return 
-	}
-	handleResponse(resp)
-
+    resp, err := makeRequest("PATCH", url, token, payload)
+    if err != nil {
+        fmt.Printf("Error in making request: %v\n", err)
+        return
+    }
+    handleResponse(resp)
 }
