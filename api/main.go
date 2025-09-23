@@ -23,10 +23,10 @@ func main() {
 	getUserPermission()
 
 	fmt.Println("Deactivate user")
-	deactivateUsers()
+	deactivateUser()
 
 	fmt.Println("Activate user")
-	activateUsers()
+	activateUser()
 
 	fmt.Println("Update User")
 	updateUsers()
