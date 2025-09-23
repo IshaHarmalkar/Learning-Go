@@ -292,3 +292,58 @@ func deactivateUsers() {
     }
     handleResponse(resp)
 }
+
+
+func activateUsers() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+    type UserDeactivation struct {
+        ID             int  `json:"id"`
+        DeactivateUser bool `json:"deactivateUser"`
+    }
+
+    type DeactivationPayload struct {
+        Users []UserDeactivation `json:"users"`
+    }
+
+ 
+    fmt.Print("Enter the user ID to activate: ")
+
+
+    reader := bufio.NewReader(os.Stdin)
+    input, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    trimmedInput := strings.TrimSpace(input)
+    id, err := strconv.Atoi(trimmedInput)
+    if err != nil {
+        log.Fatalf("Invalid input: Please enter a valid number. Error: %v", err)
+    }
+
+  
+    payload := DeactivationPayload{
+        Users: []UserDeactivation{
+            {
+                ID:             id,
+                DeactivateUser: false,
+            },
+        },
+    }
+    
+  
+    token := os.Getenv("JWT_TOKEN")
+    url := os.Getenv("ACTIVATE_USER")
+
+    resp, err := makeRequest("PATCH", url, token, payload)
+    if err != nil {
+        fmt.Printf("Error in making request: %v\n", err)
+        return
+    }
+    handleResponse(resp)
+}
