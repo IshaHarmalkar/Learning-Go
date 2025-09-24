@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 //represents a user record in db
@@ -46,7 +48,7 @@ func(r *UserRepository) CreateUser(user User) error {
 	}
 
 	fmt.Printf("User '%s' successfully created in the database.\n", user.Name)
-	log.Panicf("Inserted user with ID: %d", user.ID)
+	log.Printf("Inserted user with ID: %d", user.ID)
 
 	return nil
 

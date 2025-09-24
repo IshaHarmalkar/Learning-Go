@@ -22,6 +22,15 @@ func main() {
 	//kafka broker address
 	brokers := []string{"localhost:9092"}
 
+	//databse credentials
+	dsn := "root:@tcp(127.0.0.1:3306)/kafka"
+
+	//create the rpo instance for db operations
+	userRepo, err := NewUserRepository(dsn)
+	if err != nil {
+		log.Fatalf("Failed to iniatize user reository: %v", err)
+	}
+
 	//configure Sarama consumer
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
@@ -60,6 +69,10 @@ func main() {
 					continue
 				}
 				fmt.Printf("User created successfully: ID=%d, Name=%s, Email=%s\n", user.ID, user.Name, user.Email)
+
+				if err := userRepo.CreateUser(user); err != err {
+					log.Printf("Failed to create user in databse : %v", err)
+				}
 
 			case err := <-partitionConsumer.Errors():
 				log.Panicf("Error from consumer: %v", err)
