@@ -70,7 +70,7 @@ func main() {
 				}
 				fmt.Printf("User created successfully: ID=%d, Name=%s, Email=%s\n", user.ID, user.Name, user.Email)
 
-				if err := userRepo.CreateUser(user); err != err {
+				if err := userRepo.CreateUser(user); err != nil {
 					log.Printf("Failed to create user in databse : %v", err)
 				}
 
