@@ -5,48 +5,37 @@ import (
 	"time"
 )
 
+
+func placeOrders(orders chan string, numOrders int){
+	for i := 1; i <= numOrders; i++{
+		order := fmt.Sprintf("Coffee order #%d", i)
+		orders <- order //send order to chan
+		fmt.Println("Placed:", order)
+	}
+
+	close(orders) //signals that no more orders are coming
+}
+
+//barrista processing orders
+func processOrders(orders chan string){
+
+	//receive from chan until it's closed
+	for order := range orders {
+		fmt.Printf("Preparing %s\n", order)
+		time.Sleep(2 * time.Second) //preparing coffee
+		fmt.Printf("Served: %s\n", order)
+
+	}
+}
+
 func main() {
 	orders := make(chan string) //unbufferd channel
 
+	//start producer goroutine
 
+	go placeOrders(orders, 5)
 
-	/* since we have a go routine, a new thread is started, main routine 
-	by passes this go block
-	 */
-	go func(){
-		for i := 1; i <= 5; i++ {
-			order := fmt.Sprintf("Coffee order #d", i)
-			orders <- order //blocks until barista is ready to accept new order
-			fmt.Println("Placed:", order)
-	}
-	close(orders) 
-
-
-	/* the close tells the barista -> no more orders are comming. 
-	 without this the barista's for range orders would block forever.
-	*/
-
-
-	}()
-
-
-	/* Barista processing orders .
-	   Main routine reaches here, and iterates through this loop.
-
-
-	   in the for loop we are going through the orders channel we made, 
-	   that's the link between this for loop and the above go fn.
-	
-	
-	*/
-	for order := range orders {
-		fmt.Printf("Preparing: %s\n", order)
-		time.Sleep(2 * time.Second) //time taken to prepare the order
-		fmt.Printf("Served: %s\n", order)
-
-
-
-	}
+	processOrders(orders)
 
 	
 
