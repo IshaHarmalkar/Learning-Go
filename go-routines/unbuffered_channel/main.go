@@ -9,7 +9,7 @@ import (
 func placeOrders(orders chan string, numOrders int){
 	for i := 1; i <= numOrders; i++{
 		order := fmt.Sprintf("Coffee order #%d", i)
-		orders <- order //send order to chan
+		orders <- order //send order to chan, waits till the main rouitne is ready to receive
 		fmt.Println("Placed:", order)
 	}
 
@@ -19,7 +19,17 @@ func placeOrders(orders chan string, numOrders int){
 //barrista processing orders
 func processOrders(orders chan string){
 
-	//receive from chan until it's closed
+	/* receive from chan until it's closed
+	ie. waiting on order from orders chan.
+	the go routine unblocks over each index?
+	
+	*/
+
+	/* 
+	is this for loop at most on range 1.
+	
+	*/
+
 	for order := range orders {
 		fmt.Printf("Preparing %s\n", order)
 		time.Sleep(2 * time.Second) //preparing coffee
@@ -35,6 +45,8 @@ func main() {
 
 	go placeOrders(orders, 5)
 
+
+	//main go routine
 	processOrders(orders)
 
 	
@@ -42,3 +54,4 @@ func main() {
 }
 
 
+//Unbuffered channels block the sender until the receiver is ready (and vice versa).
