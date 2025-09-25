@@ -5,6 +5,8 @@ import "fmt"
 //sends a msg into existing channel
 func sendMessage(ch chan string){
 	ch <- "Message sent into  original channel. The chanel that was passed into this fn while calling"
+
+	fmt.Println("len og channel inside fn", len(ch))
 }
 
 /* reasign channel to a new channel inside the fn
@@ -15,6 +17,7 @@ func sendMessage(ch chan string){
 func reassignChannel(ch chan string){
 	ch = make(chan string) //new chan, unrealted to original
 	ch <- "Message sent into new channel"
+	
 }
 
 func main(){
@@ -28,15 +31,10 @@ func main(){
 
 	fmt.Println("Received from original channel:", msg)
 
-	//reassing channel
+	
 
-	go func(){
-
-		reassignChannel(originalChan)
-
-	}()
-
-	//wait a second sl
+	//wait a second to show program continues
+	fmt.Println("Original channel:",len(originalChan))
 
 	
 
