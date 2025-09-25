@@ -8,9 +8,14 @@ import (
 )
 
 type User struct {
-	ID    int    `json:"id"`
+	ID int `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
+}
+
+type KafkaMessage struct{
+	TYPE string `json:"type"` //create, update, delete
+	User User   `json:"user"`
 }
 
 type Producer struct {
@@ -62,5 +67,30 @@ func(p *Producer) SendUserMessage(topic string,user User)(int32, int64, error) {
 
 	return partition, offset, nil
 
+
+}
+
+
+
+func(p *Producer) SendUpdateMessage(topic string, user User) (int32, int64, error){
+	return p.SendUserMessage(topic, user)
+}
+
+
+func (p *Producer) SendDeleteMessage(topic string, userID int) (int32, int64, error){
+
+	payload := map[string]int{"id": userID}
+	userJSON, err := json.Marshal(payload)
+
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to seialize delete message: %w", err)
+	}
+
+	msg := &sarama.ProducerMessage{
+		Topic : topic,
+		Value: sarama.ByteEncoder(userJSON),
+	}
+
+	return p.syncProducer.SendMessage(msg)
 
 }

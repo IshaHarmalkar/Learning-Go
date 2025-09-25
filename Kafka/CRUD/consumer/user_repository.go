@@ -8,12 +8,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//represents a user record in db
-/* type User struct {
-	ID int
-	Name string
-	Email string
-} */
 
 
 type UserRepository struct {
@@ -59,3 +53,31 @@ func(r *UserRepository) CreateUser(user User) error {
 
 }
 
+
+
+func (r *UserRepository) Update(user User) error {
+	query := "UPDATE students SET name=?, email=? WHERE id=?"
+	res, err := r.db.Exec(query, user.Name, user.Email, user.ID)
+	if err != nil {
+		return fmt.Errorf("failed to update user ID %d: %w", user.ID, err)
+	}
+	rowsAffected, _ := res.RowsAffected()
+	log.Printf("Updated user ID %d, rows affected: %d", user.ID, rowsAffected)
+	return nil
+}
+
+
+func (r *UserRepository) DeleteUser(userID int) error {
+
+	query := "DELETE FROM students WHERE id=?"
+	res, err := r.db.Exec(query, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete user ID %d: %w", userID, err)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	log.Printf("Deleted user ID %d, rows affected: %d", userID, rowsAffected)
+	return nil
+
+
+}
