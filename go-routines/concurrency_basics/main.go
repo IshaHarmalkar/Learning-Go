@@ -15,11 +15,11 @@ func main() {
 
 	orders := generateOrders(20)
 
-	processOrders(orders)
+	go processOrders(orders)
 
-	updateOrderStatuses(orders)
+	go updateOrderStatuses(orders)
 
-	reportOrderStatus(orders)
+	go reportOrderStatus(orders)
 
 	fmt.Println("All operations completed. Exisitng")
 
