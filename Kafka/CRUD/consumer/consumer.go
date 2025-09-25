@@ -17,6 +17,11 @@ type User struct {
 	Email string `json:"email"`
 }
 
+type KafkaMessage struct {
+	TYPE string `json:"type"`  //create, update, delete
+	User User `json:"user"`
+}
+
 func main() {
 
 	//kafka broker address
@@ -96,15 +101,35 @@ func main() {
 			//partitionConsumer.Messages() is a channel of messages.
 			case msg := <-partitionConsumer.Messages():
 				//deserialize the message value (json) into a user struct
-				var user User
-				if err := json.Unmarshal(msg.Value, &user); err != nil{
+				var km KafkaMessage
+
+				if err := json.Unmarshal(msg.Value, &km); err != nil{
 					log.Panicf("Failed to deserialize user messaage: %v", err)
 					continue
 				}
-				fmt.Printf("User created successfully: Name=%s, Email=%s\n", user.Name, user.Email)
 
-				if err := userRepo.CreateUser(user); err != nil {
-					log.Printf("Failed to create user in databse : %v", err)
+				switch km.TYPE {
+				case "create":
+					if err := userRepo.CreateUser(km.User); err != nil {
+						log.Printf("Failed to create user: %v", err)
+					} else {
+						fmt.Printf("User '%s' created successfully\n", km.User.Name)
+					}
+				case "update":
+					if err := userRepo.Update(km.User); err != nil {
+						log.Printf("Failed to update user ID %d: %v", km.User.ID, err)
+					}else {
+						fmt.Printf("User ID %d updated successfully\n", km.User.ID)
+					}
+				case "delete":
+					if err := userRepo.DeleteUser(km.User.ID); err != nil {
+						log.Printf("Failed to delete user ID %d: %v", km.User.ID, err)
+					}else{
+						fmt.Printf("User ID %d deleted successfully\n", km.User.ID)
+					}
+				default:
+					log.Printf("Unkown Kafka message type: %s", km.TYPE)
+			
 				}
 
 			//error from kafka

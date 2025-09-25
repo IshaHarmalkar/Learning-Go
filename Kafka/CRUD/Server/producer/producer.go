@@ -43,54 +43,24 @@ func(p *Producer) Close() error {
 }
 
 
-//serializes a user and sends it to a kafka topic
-
-func(p *Producer) SendUserMessage(topic string,user User)(int32, int64, error) {
-	//serialize the user struct to json to send to kafka
-
-	userJSON, err := json.Marshal(user)
-	if err != nil {
-		return 0, 0, fmt.Errorf("failed to serialize user to json: %w", err)
+//send to kafka topic
+func (p *Producer) SendCRUDMessage(topic string, msgType string, user User) (int32, int64, error){
+	km := KafkaMessage{
+		TYPE: msgType,
+		User: user,
 	}
 
-	//create a kafka msg
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.ByteEncoder(userJSON),
-	}
-
-	//sends msg to kafka topic
-	partition, offset, err := p.syncProducer.SendMessage(msg)
+	payload, err := json.Marshal(km)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to send message to Kafka: %w", err)
-	}
-
-	return partition, offset, nil
-
-
-}
-
-
-
-func(p *Producer) SendUpdateMessage(topic string, user User) (int32, int64, error){
-	return p.SendUserMessage(topic, user)
-}
-
-
-func (p *Producer) SendDeleteMessage(topic string, userID int) (int32, int64, error){
-
-	payload := map[string]int{"id": userID}
-	userJSON, err := json.Marshal(payload)
-
-	if err != nil {
-		return 0, 0, fmt.Errorf("failed to seialize delete message: %w", err)
+		return 0, 0, fmt.Errorf("failed to serialize message: %w", err)
 	}
 
 	msg := &sarama.ProducerMessage{
-		Topic : topic,
-		Value: sarama.ByteEncoder(userJSON),
+		Topic: topic,
+		Value: sarama.ByteEncoder(payload),
 	}
 
 	return p.syncProducer.SendMessage(msg)
+
 
 }

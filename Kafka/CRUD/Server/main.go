@@ -40,33 +40,45 @@ func main(){
 
 func userHandler(w http.ResponseWriter, r *http.Request){
 	
-	//only allow post
-	if r.Method != http.MethodPost{
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	//json to user struct
-	var user producer.User
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
+	
+	var  user producer.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil{
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	partition, offset, err := userProducer.SendUserMessage("crud", user)
+	var msgType string
+	switch r.Method {
+	case http.MethodPost:
+		msgType = "create"
+	case http.MethodPut:
+		msgType = "update"
+		if user.ID == 0 {
+			http.Error(w, "Missing user ID for update", http.StatusBadRequest)
+			return
+		}
+	case http.MethodDelete:
+		msgType = "delete"
+		if user.ID == 0 {
+			http.Error(w, "Missing user ID for delete", http.StatusBadRequest)
+			return
+		}
+
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	partition, offset, err := userProducer.SendCRUDMessage("crud", msgType, user)
 	if err != nil {
 		log.Printf("Failed to send message to Kafka: %v", err)
 		http.Error(w, "Failed to send message to Kafka", http.StatusInternalServerError)
 		return
 	}
 
-
-	//send success to client
 	log.Printf("Message sent to partition %d at offset %d", partition, offset)
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "User creation message sent to Kafka successfully!")
-
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "User %s message sent to kafka successfully!", msgType)
 
 
 
