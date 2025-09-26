@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 
-	fmt.Println("Get Sites")
+	/* fmt.Println("Get Sites")
 	getSites()
 
 	fmt.Println("Get Access Points")
@@ -38,6 +38,11 @@ func main() {
 
 	fmt.Println("Create user")
 	createUser()
+ */
 
+
+ 	fmt.Println("Check if token valid")
+	getSites()
+	//checkToken()
 	
 }

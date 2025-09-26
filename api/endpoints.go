@@ -72,6 +72,7 @@ type DeleteUsersPayload struct {
 
 
 
+
 func getSites(){
 
 	err := godotenv.Load()
@@ -105,6 +106,8 @@ func getSites(){
 		},
 	}
 
+    //empty payload
+    //var payload interface{}
 
 	resp, err := makeRequest("POST", getSitesUrl, token, payload)
 	if err != nil{
@@ -113,7 +116,10 @@ func getSites(){
 	}
 	handleResponse(resp)
 
-}
+} 
+
+
+
 
 
 
@@ -624,3 +630,83 @@ func deleteUser(){
 	handleResponse(resp)
 
 }
+
+/* 
+func getSites(){
+
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	token := os.Getenv("JWT_TOKEN")
+
+	fmt.Print("Enter the site ID: ")
+    reader := bufio.NewReader(os.Stdin)
+    siteId, err := reader.ReadString('\n')
+    if err != nil {
+        log.Fatalf("Error reading input: %v", err)
+    }
+
+    
+    siteId = strings.TrimSpace(siteId)
+
+	getSitesUrl := os.Getenv("BASE_URL")
+	getSitesUrl = getSitesUrl + "/organisaionManagement/v2/integrator/organisations/" + siteId+ "/sites"
+
+
+
+
+	payload := Payload{
+		Pagination: Pagination{
+			Page:    1,
+			PerPage: 40,
+		},
+	} 
+
+
+
+   
+	resp, err := makeRequest("POST", getSitesUrl, token, payload)
+	if err != nil{
+		fmt.Println("error in making request")
+        fmt.Println(err)
+
+	}
+
+
+    println(resp)
+	handleResponse(resp)
+
+}
+ */
+/* 
+func checkToken() {
+
+
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+    url := os.Getenv("BASE_URL")
+
+
+
+	token := os.Getenv("JWT_TOKEN")
+
+    url := url + "/userManagement/integrator/v1/organisations/" + orgId + "/formData?roles=roles"
+
+    makeRequest(ur)
+
+    prinln(token, url)
+
+	
+
+
+	//resp, err := makeRequest("POST", url, token, payload)
+
+    
+
+} */
