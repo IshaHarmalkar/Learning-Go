@@ -48,3 +48,4 @@ func printUser() {
     fmt.Println(string(jsonData))
 
 }
+

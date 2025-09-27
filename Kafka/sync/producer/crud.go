@@ -76,11 +76,12 @@ func(r *UserRepository) CreateUser(user User) error {
 	}
 
 	user.Id = int(userId)
+	user.Uuid = uniqId
 
 	fmt.Printf("User '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.Uuid)
 	log.Printf("Inserted useer with ID: %d", userId)
 
-
+    fmt.Println("Inside create user, uuid: ", user.Uuid)
 
 
 	r.LogKafkaMsg(user, "create")
@@ -100,6 +101,8 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) error {
 	if err != nil{
 		fmt.Println("error: ", err)
 	}
+
+	fmt.Println("user uuid: ", user.Uuid)
 
  
 	msg := string(jsonData)	
