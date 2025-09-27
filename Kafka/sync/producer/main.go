@@ -1,5 +1,10 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 func main() {
 
 	//start server & listen
@@ -15,5 +20,31 @@ func main() {
 	//wait for consumer to ack
 
 	//write to db, ack.
+
+
+	//printUser()
+}
+
+/*
+
+go run main.go producer.go server.go crud.go
+
+*/
+
+func printUser() {
+
+	Jerry := User{
+		Id:    1,
+		Uuid:  "fjsjkf",
+		Name:  "Jerry",
+		Email: "jerry.com",
+	}
+
+	jsonData, err := json.Marshal(Jerry)
+	if err != nil{
+		fmt.Println("error: ", err)
+	}
+
+    fmt.Println(string(jsonData))
 
 }

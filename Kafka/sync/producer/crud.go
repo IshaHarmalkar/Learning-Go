@@ -14,8 +14,8 @@ import (
 )
 
 type User struct{
-	ID int `json:"id"`
-	UUID string `json:"uuid"`
+	Id int `json:"id"`
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 	Email string `json:"email"`
 }
@@ -54,6 +54,8 @@ func NewUserRepository(dsn string)(*UserRepository, error) {
 //create user
 func(r *UserRepository) CreateUser(user User) error {
 
+	fmt.Println("user received in create user: ", user)
+
 	
     ack := false
 
@@ -73,10 +75,13 @@ func(r *UserRepository) CreateUser(user User) error {
 		return fmt.Errorf("failed to fetch the user id of the user just created: %w", err)
 	}
 
-	user.ID = int(userId)
+	user.Id = int(userId)
 
-	fmt.Printf("User '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.UUID)
+	fmt.Printf("User '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.Uuid)
 	log.Printf("Inserted useer with ID: %d", userId)
+
+
+
 
 	r.LogKafkaMsg(user, "create")
 
@@ -90,23 +95,26 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) error {
 	uniqId := uuid.Must(uuid.NewRandom()).String() 
 	fmt.Println("uuid for kafka logs is: ", uniqId)
 
-	fmt.Println(user)
+
+	jsonData, err := json.Marshal(user)
+	if err != nil{
+		fmt.Println("error: ", err)
+	}
+
+ 
+	msg := string(jsonData)	
 	
 
-	msg, err := json.Marshal(user)
 
-	fmt.Println(msg)
-	fmt.Println(err)
-
-	if err != nil{
-		return fmt.Errorf("failed to convert msg to json: %v",  err)
-	}
+    user_id := user.Id
 
 
 	query := "INSERT INTO kafka_logs (uuid, user_id, msg, action) VALUES (?, ?, ?, ?)"
 
 	//execute query 
-	res, err := r.db.Exec(query, uniqId, msg, action)
+	res, err := r.db.Exec(query, uniqId, user_id,  msg, action)
+	fmt.Println("res: ", res)
+	fmt.Println("err: ", err)
 	if err != nil {
 		return fmt.Errorf("failed to %s user %s into databse: %w", action, user.Name, err)
 	}
