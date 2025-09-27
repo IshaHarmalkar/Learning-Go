@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -19,10 +20,8 @@ func startServer() {
 
 }
 
+func userHandler(w http.ResponseWriter, r *http.Request) {
 
-func userHandler(w http.ResponseWriter, r *http.Request){
-	
-	
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -32,7 +31,7 @@ func userHandler(w http.ResponseWriter, r *http.Request){
 
 	//db connection
 	//databse credentials
-	dsn := "root:@tcp(127.0.0.1:3306)/kafka"
+	dsn := "root:@tcp(127.0.0.1:3306)/kafka_sync"
 
 	//create the rpo instance for db operations
 	userRepo, err := NewUserRepository(dsn)
@@ -40,21 +39,16 @@ func userHandler(w http.ResponseWriter, r *http.Request){
 		log.Fatalf("Failed to iniatize user repository: %v", err)
 	}
 
-	
 	//var msgType string
 	switch r.Method {
 
-	case http.MethodPost:	
+	case http.MethodPost:
+		fmt.Println("Inside switch")
 		userRepo.CreateUser(u)
-
-		
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
-
-
 
 }
