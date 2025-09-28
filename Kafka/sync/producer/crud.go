@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 
@@ -79,9 +78,9 @@ func(r *UserRepository) CreateUser(user User) error {
 	user.Uuid = uniqId
 
 	fmt.Printf("User '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.Uuid)
-	log.Printf("Inserted useer with ID: %d", userId)
+	//log.Printf("Inserted useer with ID: %d", userId)
 
-    fmt.Println("Inside create user, uuid: ", user.Uuid)
+    //fmt.Println("Inside create user, uuid: ", user.Uuid)
 
 
 	r.LogKafkaMsg(user, "create")
@@ -94,7 +93,7 @@ func(r *UserRepository) CreateUser(user User) error {
 func(r *UserRepository) LogKafkaMsg(user User, action string) error {
 
 	uniqId := uuid.Must(uuid.NewRandom()).String() 
-	fmt.Println("uuid for kafka logs is: ", uniqId)
+	//fmt.Println("uuid for kafka logs is: ", uniqId)
 
 
 	jsonData, err := json.Marshal(user)
@@ -116,8 +115,8 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) error {
 
 	//execute query 
 	res, err := r.db.Exec(query, uniqId, user_id,  msg, action)
-	fmt.Println("res: ", res)
-	fmt.Println("err: ", err)
+	//fmt.Println("res: ", res)
+	//fmt.Println("err: ", err)
 	if err != nil {
 		return fmt.Errorf("failed to %s user %s into databse: %w", action, user.Name, err)
 	}
@@ -152,5 +151,38 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) error {
     return nil	
 
 	
+
+}
+
+
+
+func (r *UserRepository) processAck(userId int, action string) error{
+
+
+	fmt.Println("writitng ack to db ")
+
+	
+    ack := true
+
+	
+
+	query := "UPDATE  users  SET ack = ? WHERE id = ?"
+	//execute query 
+	res, err := r.db.Exec(query, ack, userId)
+	if err != nil {
+		return fmt.Errorf("failed to ack user %d into databse: %w", userId, err)
+	}
+
+	
+
+
+	fmt.Println(res)
+
+
+
+	
+
+    return nil	
+
 
 }

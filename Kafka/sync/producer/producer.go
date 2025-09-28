@@ -21,6 +21,7 @@ func NewProducer(brokers []string) (*Producer, error) {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
 	config.Producer.Return.Successes = true
+	
 
 	syncProducer, err := sarama.NewSyncProducer(brokers, config)
 	if err != nil {

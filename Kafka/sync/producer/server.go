@@ -51,5 +51,8 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
+	NewConsumer()
+
 }
 
