@@ -49,8 +49,8 @@ func main() {
 
 	//process messages as they get posted in the topic
 	for msg := range partitionConsumer.Messages() {
-		log.Println("raw kafka msg: ", msg.Value)
-		log.Println("Received message: ", string(msg.Value))
+		/* log.Println("raw kafka msg: ", msg.Value)
+		log.Println("Received message: ", string(msg.Value)) */
 		
         var km KafkaMessage
 
@@ -68,9 +68,6 @@ func main() {
 		}
 
 		ackProducer.SendAck(ack)
-
-
-
 
 		
 	}
