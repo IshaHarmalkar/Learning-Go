@@ -38,20 +38,37 @@ func(p *Producer) Close() error {
 
 
 
-func (p *Producer) SendMsgToConsumer(KafkaMessage KafkaMessage) (int32, int64, error){
+func SendMsgToConsumer(KafkaMessage KafkaMessage)(error) {
+
+
+	 //var producerPtr *producer.Producer
+	brokers := []string{"localhost:9092"}
+
+	userProducer, err := NewProducer(brokers)
+
+	if err != nil {
+		return fmt.Errorf("new producer could not be created in kafka log fn: %v", err)
+	}	
+
+	defer userProducer.Close()
+
+
 
 	payload, err := json.Marshal(KafkaMessage)
 
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to convert to json when sending to consumer")
+	  return fmt.Errorf("failed to convert to json when sending to consumer")
 	}
 
 	msg := &sarama.ProducerMessage{
-
 		Topic : "sync_user_test",
 		Value: sarama.ByteEncoder(payload),
 	}
 
-	return p.syncProducer.SendMessage(msg)
+	userProducer.syncProducer.SendMessage(msg)
+
+	return nil
+
+
 
 }

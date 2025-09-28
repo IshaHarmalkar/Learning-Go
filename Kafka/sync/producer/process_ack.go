@@ -17,7 +17,7 @@ type Ack struct {
 }
 
 
-func NewConsumer() {
+func ListentoAck() {
 
 	println("New consumer")
 
@@ -59,7 +59,7 @@ func NewConsumer() {
 		}
 
 		userId := ackMsg.Id
-		action := ackMsg.Action
+		//action := ackMsg.Action
 
 		dsn := "root:@tcp(127.0.0.1:3306)/kafka_sync"
 
@@ -71,7 +71,7 @@ func NewConsumer() {
 
 	   fmt.Println("ack sent for processing")
 
-		ackRepo.processAck(userId, action)
+		ackRepo.processAck(userId)
 
 	
 	

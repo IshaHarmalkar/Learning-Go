@@ -7,22 +7,15 @@ import (
 
 func main() {
 
-	//start server & listen
+	
 
+	//start server & listen
 	startServer()
 
-	//take req , parse body to user struct and call appropriate method
-
-	//write to db -> crud.go
-
-	//sent kafka message to consumer
-
-	//wait for consumer to ack
-
-	//write to db, ack.
+	
 
 
-	//printUser()
+	
 }
 
 /*
@@ -48,4 +41,6 @@ func printUser() {
     fmt.Println(string(jsonData))
 
 }
+
+
 

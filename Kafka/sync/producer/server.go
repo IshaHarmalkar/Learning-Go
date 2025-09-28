@@ -43,8 +43,14 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 
 	case http.MethodPost:
-		fmt.Println("Inside switch")
-		userRepo.CreateUser(u)
+		
+		res, err := userRepo.CreateUser(u)
+		handleError(err)		
+		km, err := userRepo.LogKafkaMsg(res, "create")
+		handleError(err)
+
+		SendMsgToConsumer(km)
+		
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -52,7 +58,16 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	NewConsumer()
+	
 
 }
 
+
+func handleError(err error){
+
+	if err != nil {
+		fmt.Println(err)
+
+	}
+
+}

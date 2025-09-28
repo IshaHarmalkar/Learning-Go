@@ -51,136 +51,79 @@ func NewUserRepository(dsn string)(*UserRepository, error) {
 }
 
 //create user
-func(r *UserRepository) CreateUser(user User) error {
-
-	fmt.Println("user received in create user: ", user)
-
-	
+func(r *UserRepository) CreateUser(user User) (User, error) {	
     ack := false
 
 	uniqId := uuid.Must(uuid.NewRandom()).String()  //uniqId refers to uuid. did not use uuid, as not sure if it would conflcit package name
-	fmt.Println("Generate uuid:", uniqId)
-
+	
 	query := "INSERT INTO users (uuid, name, email, ack) VALUES (?, ?, ?, ?)"
 
 	//execute query 
 	res, err := r.db.Exec(query,uniqId, user.Name, user.Email, ack)
 	if err != nil {
-		return fmt.Errorf("failed to insert user %s into databse: %w", user.Name, err)
+		return user, fmt.Errorf("failed to insert user %s into databse: %w", user.Name, err)
 	}
 
 	userId, err := res.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("failed to fetch the user id of the user just created: %w", err)
+		return user, fmt.Errorf("failed to fetch the user id of the user just created: %w", err)
 	}
 
 	user.Id = int(userId)
 	user.Uuid = uniqId
 
-	fmt.Printf("User '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.Uuid)
-	//log.Printf("Inserted useer with ID: %d", userId)
+	fmt.Printf("user '%s' successfully created in the db with ID %d and uuid %s. \n", user.Name, userId, user.Uuid)
 
-    //fmt.Println("Inside create user, uuid: ", user.Uuid)
-
-
-	r.LogKafkaMsg(user, "create")
-
-    return nil	
+	
+    return user, nil	
 
 }
 
 
-func(r *UserRepository) LogKafkaMsg(user User, action string) error {
+func(r *UserRepository) LogKafkaMsg(user User, action string) (KafkaMessage, error) {
+
+	var km  KafkaMessage 
 
 	uniqId := uuid.Must(uuid.NewRandom()).String() 
-	//fmt.Println("uuid for kafka logs is: ", uniqId)
-
-
 	jsonData, err := json.Marshal(user)
 	if err != nil{
 		fmt.Println("error: ", err)
 	}
-
-	fmt.Println("user uuid: ", user.Uuid)
-
  
 	msg := string(jsonData)	
-	
-
-
     user_id := user.Id
 
-
-	query := "INSERT INTO kafka_logs (uuid, user_id, msg, action) VALUES (?, ?, ?, ?)"
-
-	//execute query 
-	res, err := r.db.Exec(query, uniqId, user_id,  msg, action)
-	//fmt.Println("res: ", res)
-	//fmt.Println("err: ", err)
+	query := "INSERT INTO kafka_logs (uuid, user_id, msg, action) VALUES (?, ?, ?, ?)"	
+	res, err := r.db.Exec(query, uniqId, user_id,  msg, action)	
 	if err != nil {
-		return fmt.Errorf("failed to %s user %s into databse: %w", action, user.Name, err)
-	}
-
-	
-	
+		return km,  fmt.Errorf("failed to %s user %s into databse: %w", action, user.Name, err)
+	}	
 
 	fmt.Printf("Logged Kafka msg to db: %v. \n", res)
 
-	km := KafkaMessage{
+	km = KafkaMessage{
 		Action: action,
 		User: user,
 	}
-	
-    //var producerPtr *producer.Producer
-	brokers := []string{"localhost:9092"}
 
-	userProducer, err := NewProducer(brokers)
-
-	if err != nil {
-		return fmt.Errorf("new producer could not be created in kafka log fn: %v", err)
-	}
-
-
-	//send msg to consumer
-	userProducer.SendMsgToConsumer(km)
-
-	defer userProducer.Close()
-
-
-
-    return nil	
-
-	
+	return km, nil
 
 }
 
 
 
-func (r *UserRepository) processAck(userId int, action string) error{
-
-
+func (r *UserRepository) processAck(userId int) error{
 	fmt.Println("writitng ack to db ")
-
-	
-    ack := true
-
-	
+    ack := true	
 
 	query := "UPDATE  users  SET ack = ? WHERE id = ?"
-	//execute query 
+	
 	res, err := r.db.Exec(query, ack, userId)
 	if err != nil {
 		return fmt.Errorf("failed to ack user %d into databse: %w", userId, err)
-	}
+	}	
 
-	
-
-
-	fmt.Println(res)
-
-
-
-	
+	fmt.Println("ack written to db", res)
 
     return nil	
 
