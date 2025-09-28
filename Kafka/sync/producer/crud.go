@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/google/uuid"
 
@@ -110,9 +111,38 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) (KafkaMessage, err
 
 }
 
+func (r *UserRepository) Update(user User) (User, error) {
+	ack := false
+	query := "UPDATE users SET name=?, email=?, ack=? WHERE id=?"
+	res, err := r.db.Exec(query, user.Name, user.Email, user.Id, ack)
+	if err != nil {
+		return user, fmt.Errorf("failed to update user ID %d: %w", user.Id, err)
+	}
+	rowsAffected, _ := res.RowsAffected()
+	log.Printf("Updated user ID %d, rows affected: %d", user.Id, rowsAffected)
+	return user, nil
+}
+
+func (r *UserRepository) DeleteUser(user User) (User, error) {
+
+	//ack := false
+	userId := user.Id
+	query := "DELETE FROM students WHERE id=?"
+	res, err := r.db.Exec(query, userId)
+	if err != nil {
+		return user, fmt.Errorf("failed to delete user ID %d: %w", userId, err)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	log.Printf("Deleted user ID %d, rows affected: %d", userId, rowsAffected)
+	return user, nil
 
 
-func (r *UserRepository) processAck(userId int) error{
+}
+
+
+
+func (r *UserRepository) synAck(userId int) error{
 	fmt.Println("writitng ack to db ")
     ack := true	
 
@@ -120,12 +150,14 @@ func (r *UserRepository) processAck(userId int) error{
 	
 	res, err := r.db.Exec(query, ack, userId)
 	if err != nil {
-		return fmt.Errorf("failed to ack user %d into databse: %w", userId, err)
+		 fmt.Printf("failed to ack user %d into databse: %v", userId, err)
 	}	
 
 	fmt.Println("ack written to db", res)
 
-    return nil	
+	return nil
+
+    
 
 
 }

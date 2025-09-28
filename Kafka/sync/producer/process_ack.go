@@ -17,7 +17,9 @@ type Ack struct {
 }
 
 
-func ListentoAck() {
+
+
+func ListenForAck() {
 
 	println("New consumer")
 
@@ -41,7 +43,7 @@ func ListentoAck() {
 	if err != nil {
 		log.Fatalf("Failed to start partition consumer: %v", err)
 	}
-  
+
 	defer partitionConsumer.Close()
 
 
@@ -51,7 +53,7 @@ func ListentoAck() {
 	for msg := range partitionConsumer.Messages() {
 		
 		
-        var ackMsg Ack
+		var ackMsg Ack
 
 		if err := json.Unmarshal(msg.Value, &ackMsg); err != nil{
 			log.Panicf("Failed to deserialize user messaage: %v", err)
@@ -69,20 +71,8 @@ func ListentoAck() {
 			log.Fatalf("Failed to iniatize user repository: %v", err)
 		}
 
-	   fmt.Println("ack sent for processing")
-
-		ackRepo.processAck(userId)
-
-	
-	
-
-
-
-
+		fmt.Println("ack sent for processing")
+		ackRepo.synAck(userId)
 		
 	}
-
-
-
 }
-
