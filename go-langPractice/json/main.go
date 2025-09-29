@@ -3,59 +3,70 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
-type City struct {
-	Name       string      `json:"city_name"`
-	GDP        int		   `json:"-"`  //does not show field in json output.
-	Population int		   `json:"city_population`
+type response1 struct {
+	Page   int
+	Fruits []string
 }
 
-type User struct {
-	Name      string      `json:"name"`
-	Age       int 	      `json:"age"`
-	City      City        `json:"city"`
-	CreatedAt customTime	  `json:"created_at"`
-	DeletedAt  customTime  `json:"deleted_at,omitempty"`
+type response2 struct {
+	Page   int      `json:"page"`
+	Fruits []string `json:"fruits"`
 }
-
-type customTime struct {
-	time.Time
-}
-
-const layout = "2006-01-02"
-
-
-
-func (c customTime) MarshalJson() ([]byte, error) {
-
-	return []byte(fmt.Sprintf("\"%s\"", c.Format(layout))), nil
-}
-
-
 
 func main() {
 
-	//t := time.Now()
+	 bolB, _ := json.Marshal(true)
+	fmt.Println(string(bolB))
 
-	u := User{
-		Name: "bob",
-		Age:  20,
-		City: City{
-			Name:       "london",
-			GDP:        500,
-			Population: 8000000},
-		CreatedAt: customTime{time.Now()},
-		
-	}
+	intB, _ := json.Marshal(1)
+	fmt.Println(string(intB))
 
-	out, err := json.Marshal(u)
-	if err != nil {
+	fltB, _ := json.Marshal("2.34")
+	fmt.Println(string(fltB))
+
+	strB, _ := json.Marshal("gropher")
+	fmt.Println(string(strB))
+
+	slcD := []string{"apple", "peach", "pear"}
+	slcB, _ := json.Marshal(slcD)
+	fmt.Println(string(slcB))
+
+	mapD := map[string]int{"apple": 5, "lettuce": 7}
+	mapB, _ := json.Marshal(mapD)
+	fmt.Println(string(mapB))
+
+	res1D := &response1{
+		Page: 1,
+		Fruits: []string{"apple", "peach", "pear"}}
+	
+	res1B, _ := json.Marshal(res1D)
+	fmt.Println(string(res1B))
+
+	res2D := &response2{
+		Page:    1,
+		Fruits:  []string{"apple", "peach", "pear"}}
+	
+	res2B, _ := json.Marshal(res2D)
+
+	fmt.Println(string(res2B)) 
+
+	 byt := []byte(`{"num":6.13, "strs":["a", "b"]}`)
+
+
+	var dat map[string]interface{}
+
+	if err := json.Unmarshal(byt, &dat); err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(out))
+	fmt.Println(dat)
+
+	num := dat["num"].(float64)
+	fmt.Println(num) 
+
+
+
+
 }
-
-
