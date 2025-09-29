@@ -7,20 +7,37 @@ import (
 )
 
 type City struct {
-	Name       string
-	GDP        int
-	Population int
+	Name       string      `json:"city_name"`
+	GDP        int		   `json:"-"`  //does not show field in json output.
+	Population int		   `json:"city_population`
 }
 
 type User struct {
-	Name      string
-	Age       int
-	City      City
-	CreatedAt time.Time
-	DeleteAt  *time.Time
+	Name      string      `json:"name"`
+	Age       int 	      `json:"age"`
+	City      City        `json:"city"`
+	CreatedAt customTime	  `json:"created_at"`
+	DeletedAt  customTime  `json:"deleted_at,omitempty"`
 }
 
+type customTime struct {
+	time.Time
+}
+
+const layout = "2006-01-02"
+
+
+
+func (c customTime) MarshalJson() ([]byte, error) {
+
+	return []byte(fmt.Sprintf("\"%s\"", c.Format(layout))), nil
+}
+
+
+
 func main() {
+
+	//t := time.Now()
 
 	u := User{
 		Name: "bob",
@@ -29,7 +46,8 @@ func main() {
 			Name:       "london",
 			GDP:        500,
 			Population: 8000000},
-		CreatedAt: time.Now(),
+		CreatedAt: customTime{time.Now()},
+		
 	}
 
 	out, err := json.Marshal(u)
@@ -39,3 +57,5 @@ func main() {
 
 	fmt.Println(string(out))
 }
+
+
