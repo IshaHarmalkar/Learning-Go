@@ -1,0 +1,5 @@
+package multiservice
+
+func processEvent() {
+
+}

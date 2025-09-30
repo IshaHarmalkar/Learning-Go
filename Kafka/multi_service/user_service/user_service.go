@@ -1,0 +1,114 @@
+package main
+
+import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+
+type User struct {
+	Id    int    `json:"id"`
+	Uuid  string `json:"uuid"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
+
+type UserRepository struct {
+	db *sql.DB
+}
+
+
+
+
+func NewUserRepository() (*UserRepository, error) {
+	dsn := "root:@tcp(127.0.0.1:3306)/multi_service"
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database connecction: %w", err)
+	}
+
+	fmt.Println("Inside new user repo fn")
+
+	//pinng the db to ensure the connection is live
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	return &UserRepository{db: db}, nil
+
+}	 
+
+
+func getUser(w http.ResponseWriter,	r *http.Request,) {
+
+	var user User
+
+	//connecting to db
+	dsn := "root:@tcp(127.0.0.1:3306)/mutl_service"
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		log.Panic("failed to open database connecction: %w", err)
+	}
+
+	//pinng the db to ensure the connection is live
+	if err := db.Ping(); err != nil {
+		log.Panic("failed to ping database: %w", err)
+	} 
+
+
+	//extracting user id from req
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(
+			w, err.Error(), http.StatusBadRequest,
+		)
+		return
+	
+	}
+
+
+	//process 
+	res, err :=  db.Query("SELECT * FROM users WHERE id = ?", id)
+	if err != nil {
+		http.Error(
+			w,
+			"user not found, error fetching from db",
+			http.StatusNotFound,
+		)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+
+	/* j, err := json.Marshal(res) //byte slice
+	if err != nil {
+		http.Error(
+			w, err.Error(), http.StatusInternalServerError,
+		)
+		return
+	
+	}
+ */
+
+ 	user.Id = int(id)   
+	json.NewEncoder(w).Encode(user)
+   
+	//json.NewEncoder(w).Encode(res)
+
+	w.WriteHeader(http.StatusOK)
+
+	
+
+}
+
+
+
+
