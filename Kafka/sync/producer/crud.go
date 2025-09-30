@@ -113,13 +113,15 @@ func(r *UserRepository) LogKafkaMsg(user User, action string) (KafkaMessage, err
 
 func (r *UserRepository) Update(user User) (User, error) {
 	ack := false
-	query := "UPDATE users SET name=?, email=?, ack=? WHERE id=?"
-	res, err := r.db.Exec(query, user.Name, user.Email, user.Id, ack)
+	
+	query := "UPDATE users SET name=?, email=?, ack=? WHERE id=? AND uuid=?"
+	res, err := r.db.Exec(query, user.Name, user.Email, ack, user.Id, user.Uuid)
+	fmt.Println(res)
 	if err != nil {
-		return user, fmt.Errorf("failed to update user ID %d: %w", user.Id, err)
+		return user, fmt.Errorf("failed to update user with id: %d and uuid: %s %w", user.Id,user.Uuid, err)
 	}
 	rowsAffected, _ := res.RowsAffected()
-	log.Printf("Updated user ID %d, rows affected: %d", user.Id, rowsAffected)
+	log.Printf("Updated user ID %d, with uuid: %s, rows affected: %d", user.Id, user.Uuid, rowsAffected)
 	return user, nil
 }
 
@@ -127,14 +129,17 @@ func (r *UserRepository) DeleteUser(user User) (User, error) {
 
 	//ack := false
 	userId := user.Id
-	query := "DELETE FROM students WHERE id=?"
-	res, err := r.db.Exec(query, userId)
+	userUuid := user.Uuid
+
+
+	query := "DELETE FROM users WHERE id=? AND uuid=?" 
+	res, err := r.db.Exec(query, userId, userUuid)
 	if err != nil {
 		return user, fmt.Errorf("failed to delete user ID %d: %w", userId, err)
 	}
 
 	rowsAffected, _ := res.RowsAffected()
-	log.Printf("Deleted user ID %d, rows affected: %d", userId, rowsAffected)
+	log.Printf("Deleted user ID %d, uuid: %s rows affected: %d", userId, userUuid, rowsAffected)
 	return user, nil
 
 

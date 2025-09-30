@@ -20,13 +20,13 @@ func startServer() {
 
 }
 
-func userHandler(w http.ResponseWriter, r *http.Request) {
+func userHandler(w http.ResponseWriter, r *http.Request){
 
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+		
 	}
 
 	//db connection
@@ -56,9 +56,9 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		println("we are still in wswitch")
 
 	case http.MethodPut:		
-		if u.Id == 0 {
-			http.Error(w, "Missing user ID for update", http.StatusBadRequest)
-			return
+		if u.Id == 0 || u.Uuid == "" {
+			http.Error(w, "Missing user ID or uuid for update ", http.StatusBadRequest)
+			
 		}
 
 		res, err := userRepo.Update(u)
@@ -72,10 +72,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		ListenForAck()
 
 	case http.MethodDelete:		
-		if u.Id == 0 {
-			http.Error(w, "Missing user ID for delete", http.StatusBadRequest)
-			return
+		if u.Id == 0 || u.Uuid == "" {
+			http.Error (w, "Missing user ID for delete", http.StatusBadRequest)
+			
 		}
+
+		
 		res, err := userRepo.DeleteUser(u)
 		handleError(err)
 		km, err := userRepo.LogKafkaMsg(res, "delete")
@@ -91,9 +93,11 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+		
 	}
 
+	
+	
 	w.WriteHeader(http.StatusOK)
 
 
