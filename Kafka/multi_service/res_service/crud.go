@@ -55,10 +55,44 @@ func(r *UserRepository) CreatePass(km KafkaMessage) (KafkaMessage, error) {
 
 	println("pass id is:%v",passId)
 
-	fmt.Printf("id :%d, pass logged for user %s with event_id %d", passId, user.Name, event.Id)
+	fmt.Printf("id :%d, pass logged for user %s with event_id %s", passId, user.Name, event.Id)
 
 	
     return km, nil	
 
 }
 
+
+
+func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, error) {	
+	fmt.Println("Checking if duplicate: ", km)
+
+    
+    eventId := km.Event.Id	
+	user := km.User
+	event := km.Event
+
+    var passId int	
+
+	query :="SELECT id, pass_action, user_id, name, email, role FROM pass WHERE event_id = ?"
+	row := r.db.QueryRow(query, eventId)
+	switch err := row.Scan(&passId, &event.Action,&user.Id, &user.Name, &user.Email, &user.Role); err {
+		
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+			return false, nil
+		case nil:
+			fmt.Println("passId: ", passId)
+			fmt.Println("user: ", user)
+			fmt.Println("event: ", event)
+		default:
+			panic(err)
+
+	}
+
+	fmt.Println("printing:", user.Id, user.Uuid)
+
+	
+    return true, nil	
+
+}

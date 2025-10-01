@@ -51,14 +51,24 @@ func main() {
 			continue
 		}
 
-
-		res, err := db.CreatePass(km)
+		res, err := db.checkDuplicate(km)
 		if err != nil {
-			log.Panicf("Query failed: ", err)
+			fmt.Println("checking for duplicates failed")
+		}
+		if res {
+			fmt.Printf("Write to duplicates")
+		} else {
+			res, err := db.CreatePass(km)
+			if err != nil {
+				log.Panicf("Query failed: %v ", err)
+				
+			}
+
+		  fmt.Println("written to db ", res)
+
 		}
 
-		fmt.Println("written to db ", res)
-
+		
 		
 
 
