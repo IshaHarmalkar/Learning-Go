@@ -75,15 +75,27 @@ func getUser(w http.ResponseWriter,	r *http.Request,) {
 
 
 	//process 
-	res, err :=  db.Query("SELECT * FROM users WHERE id = ?", id)
-	if err != nil {
-		http.Error(
-			w,
-			"user not found, error fetching from db",
-			http.StatusNotFound,
-		)
-		return
+
+	
+	query :="SELECT id, uuid, name, email, role FROM users WHERE id = ?"
+	row := db.QueryRow(query, 1)
+	switch err := row.Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Role); err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+		case nil:
+			fmt.Println(user.Id, user.Uuid)
+		default:
+			panic(err)
+
 	}
+
+	fmt.Println(user.Id, user.Uuid)
+
+	
+
+
+
+	
 
 	w.Header().Set("Content-Type", "application/json")
 
