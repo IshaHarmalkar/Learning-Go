@@ -27,7 +27,7 @@ type UserRepository struct {
 
 
 
-func NewUserRepository() (*UserRepository, error) {
+/* func NewUserRepository() (*UserRepository, error) {
 	dsn := "root:@tcp(127.0.0.1:3306)/multi_service"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -43,7 +43,7 @@ func NewUserRepository() (*UserRepository, error) {
 
 	return &UserRepository{db: db}, nil
 
-}	 
+}	  */
 
 
 func getUser(w http.ResponseWriter,	r *http.Request,) {
@@ -78,7 +78,7 @@ func getUser(w http.ResponseWriter,	r *http.Request,) {
 
 	
 	query :="SELECT id, uuid, name, email, role FROM users WHERE id = ?"
-	row := db.QueryRow(query, 1)
+	row := db.QueryRow(query, id)
 	switch err := row.Scan(&user.Id, &user.Uuid, &user.Name, &user.Email, &user.Role); err {
 		case sql.ErrNoRows:
 			fmt.Println("No rows were returned!")
@@ -89,32 +89,10 @@ func getUser(w http.ResponseWriter,	r *http.Request,) {
 
 	}
 
-	fmt.Println(user.Id, user.Uuid)
-
-	
-
-
-
-	
-
+	//fmt.Println(user.Id, user.Uuid)
 	w.Header().Set("Content-Type", "application/json")
-
-
-	/* j, err := json.Marshal(res) //byte slice
-	if err != nil {
-		http.Error(
-			w, err.Error(), http.StatusInternalServerError,
-		)
-		return
-	
-	}
- */
-
- 	user.Id = int(id)   
+ 	//user.Id = int(id)   
 	json.NewEncoder(w).Encode(user)
-   
-	//json.NewEncoder(w).Encode(res)
-
 	w.WriteHeader(http.StatusOK)
 
 	

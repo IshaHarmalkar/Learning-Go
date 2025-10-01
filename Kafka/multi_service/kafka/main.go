@@ -26,35 +26,35 @@ func main() {
 		}
 
 	*/
-	retry := 0
-
-
+	
+	retry := 1
 	var u User
 	var err error
 	flag := -1
 	//flag = -1
-	u, flag, err = getUser("1", &retry, &flag)
-	
+	//u, flag, err = getUser("1", &retry)
 
 	for retry < 3 && flag == -1 {
-
 		
-		u, flag, err := getUser("1", &retry, &flag)
+		fmt.Println("Entered for loop, flag is set to: ", flag)	
+		fmt.Println("Entered for loop, retry is set to: ", retry, &retry)		
+
+		u, flag, err := getUser("1", &retry)
 		fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)				
-		cacheMutex.Lock()
+		
 		if flag == -1 {
 		    fmt.Println("sleeping for 1 minute before retrying")
-			time.Sleep(1 * time.Minute)	
+			time.Sleep(30 * time.Second)	
 
-		}	
-		
-	    cacheMutex.Unlock()	
+		} else {
+			break
+		}		   
 
 
 	}
 
 	if flag == 0 {
-		log.Fatalf("Non server error: %v", err)
+		log.Fatalf("Non server error, outside for loop: %v", err)
 	} else {
 		fmt.Println("User val when server up: ", u)
 		sendEvent(e, u)

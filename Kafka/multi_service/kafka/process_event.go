@@ -12,28 +12,22 @@ import (
 var cacheMutex sync.RWMutex
 
 
-func getUser(userId string, retry *int, flag *int) (User, int, error) {
+func getUser(userId string, retry *int) (User, int, error) {
 	var user User	
 
 	url := "http://localhost:8080/users/" + userId
-	fmt.Println(url)
+	//fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
-		//log.Fatalln("https request failed:", err)
-		cacheMutex.Lock()
-
-		*retry++	
-		cacheMutex.Unlock()
-
-		*flag = -1
-
-		
+		fmt.Println("could not hit server")	
+		*retry++		
+		resp.Body.Close()	
 		return user, -1, err
 	}
 	
 	
 
-	defer resp.Body.Close()
+	//defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -48,3 +42,22 @@ func getUser(userId string, retry *int, flag *int) (User, int, error) {
 	return user, 1, nil
 }
 
+
+
+func check() {
+	
+	i := 5
+
+	changeVal(ptr *int) {
+		fmt.Println(ptr)
+
+
+
+	}
+
+
+
+
+}
+
+func changeVal(*int)
