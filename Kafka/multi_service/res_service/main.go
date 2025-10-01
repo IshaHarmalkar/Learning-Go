@@ -75,7 +75,7 @@ func main() {
 				
 			}
 
-		  fmt.Println("written to db ", res)
+		  fmt.Println("written to pass db ", res)
 
 		}
 

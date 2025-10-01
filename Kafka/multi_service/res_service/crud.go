@@ -20,14 +20,14 @@ func NewUserRepository() (*UserRepository, error) {
 		return nil, fmt.Errorf("failed to open database connecction: %w", err)
 	}
 
-	fmt.Println("Inside new user repo fn")
+	//fmt.Println("Inside new user repo fn")
 
 	//pinng the db to ensure the connection is live
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	fmt.Println("db pointer returnerd")
+	//fmt.Println("db pointer returnerd")
 
 	return &UserRepository{db: db}, nil
 
@@ -90,7 +90,7 @@ func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, int, error) {
 
 	}
 
-	fmt.Println("printing:", user.Id, user.Uuid)
+	//fmt.Println("printing:", user.Id, user.Uuid)
 
 	
     return true, passId, nil	
@@ -119,7 +119,7 @@ func(r *UserRepository) CreateDuplicate(km KafkaMessage, passId int) (KafkaMessa
 
 	println("duplicate id is:%v",duplicateId)
 
-	fmt.Printf("id :%d, duplicated logged for user %s with event_id %s", duplicateId, user.Name, event.Id)
+	//fmt.Printf("id :%d, duplicated logged for user %s with event_id %s", duplicateId, user.Name, event.Id)
 
 	
     return km, nil	

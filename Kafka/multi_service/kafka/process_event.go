@@ -5,11 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"sync"
 )
-
-
-var cacheMutex sync.RWMutex
 
 
 func getUser(userId string, retry *int) (User, int, error) {
@@ -20,8 +16,7 @@ func getUser(userId string, retry *int) (User, int, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("could not hit server")	
-		*retry++		
-		resp.Body.Close()	
+		*retry++
 		return user, -1, err
 	}
 	
@@ -43,21 +38,3 @@ func getUser(userId string, retry *int) (User, int, error) {
 }
 
 
-
-func check() {
-	
-	i := 5
-
-	changeVal(ptr *int) {
-		fmt.Println(ptr)
-
-
-
-	}
-
-
-
-
-}
-
-func changeVal(*int)
