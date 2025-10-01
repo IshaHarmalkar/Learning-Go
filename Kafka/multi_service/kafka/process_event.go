@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 )
 
-func getUser() {
+func getUser() User {
 
 	resp, err := http.Get("http://localhost:8080/users/1")
 	if err != nil {
@@ -21,7 +23,17 @@ func getUser() {
 
 
 	//convert the body to str
-	sb := string(body)
+	/* sb := string(body)
 	log.Printf(sb)
+ */
+
+	var user User
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		fmt.Println("Converting to struct error: ", err)
+	}
+
+	return user
+
 
 }

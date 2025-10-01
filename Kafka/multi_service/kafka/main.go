@@ -17,7 +17,10 @@ func main() {
 
 	fmt.Println(e)
 
-	getUser()
+	u := getUser()
+	
+
+	fmt.Println(u)
 
 
 
