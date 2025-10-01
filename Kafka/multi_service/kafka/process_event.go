@@ -29,6 +29,6 @@ func getUser(userId string, retry *int) (User, int, error) {
 		return user, 0, err
 	}
 
-	return user, 0, nil
+	return user, 1, nil
 }
 

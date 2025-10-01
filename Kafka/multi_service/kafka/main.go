@@ -29,16 +29,31 @@ func main() {
 	retry := 0
 
 
-	var u User
+/* 	var u User
 	var err error
-	var flag int = -1
-	//u, err, flag := getUser("1", &retry)
+	var flag int  */
+	u, flag, err := getUser("1", &retry)
 	
 
 	for retry < 3 && flag == -1 {
-		u, err, flag := getUser("1", &retry)
+
+
+		u,flag, err := getUser("1", &retry)
 
 		fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)
+		
+		
+
+		if flag == -1 {
+		    fmt.Println("sleeping for 1 minute before retrying")		
+
+			time.Sleep(1 * time.Minute)
+			if flag != -1{
+				break
+			}
+
+		}		
+
 
 	}
 
@@ -47,9 +62,6 @@ func main() {
 	} else {
 		fmt.Println("User val when server up: ", u)
 		sendEvent(e, u)
-
-
-
 	}
 
 	
