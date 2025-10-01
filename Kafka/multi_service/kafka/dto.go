@@ -11,7 +11,7 @@ type User struct {
 }
 
 type Event struct {
-	Id        int       `json:"id"`
+	Id        string       `json:"id"`
 	Action    string    `json:"action"`
 	Timestamp time.Time `json:"timestamp"`
 	Location  string    `json:"location"`
