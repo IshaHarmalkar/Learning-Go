@@ -8,24 +8,19 @@ import (
 	"net/http"
 )
 
-func getUser() User {
+func getUser(userId string) User {
 
-	resp, err := http.Get("http://localhost:8080/users/1")
+	url := "http://localhost:8080/users/" + userId
+	fmt.Println(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalln("https request failed:", err)
 	}
-
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-
-	//convert the body to str
-	/* sb := string(body)
-	log.Printf(sb)
- */
 
 	var user User
 	err = json.Unmarshal(body, &user)
@@ -34,6 +29,5 @@ func getUser() User {
 	}
 
 	return user
-
-
 }
+

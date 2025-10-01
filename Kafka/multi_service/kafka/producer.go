@@ -29,7 +29,7 @@ func (p *Producer) Close() error {
 	return  p.syncProducer.Close()
 } 
 
-func sendEvent(km KafkaMessage)(error) {
+func sendEvent(e Event, u User)(error) {
 
 	brokers := []string{"localhost:9092"}
 	eventProducer, err := NewProducer(brokers)
@@ -39,11 +39,17 @@ func sendEvent(km KafkaMessage)(error) {
 
 	defer eventProducer.Close()
 
+	km := KafkaMessage{
+		Event: e,
+		User: u,		
+	}	
 
 	payload, err := json.Marshal(km)
 	if err != nil {
 		return fmt.Errorf("failed to marshal kafka msg to json inside sendEvent")
 	}
+
+
 
 
 	msg :=  &sarama.ProducerMessage{
@@ -52,6 +58,7 @@ func sendEvent(km KafkaMessage)(error) {
 	}
 
    eventProducer.syncProducer.SendMessage(msg)
+   fmt.Println("Message Sent")
 
    return nil
 

@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
 func main() {
 
-	eventId := 1
+	eventId := 2
 	e := Event{
 		Id:        eventId,
 		Action:    "door_open",
@@ -15,12 +14,17 @@ func main() {
 		Location: "Bangalore",
 	}
 
-	fmt.Println(e)
-
-	u := getUser()
 	
 
-	fmt.Println(u)
+	u := getUser("1")
+	
+
+	/* km := KafkaMessage{
+		Event: e,
+		User: u,		
+	} */
+
+	sendEvent(e, u)
 
 
 
