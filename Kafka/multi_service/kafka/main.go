@@ -1,6 +1,9 @@
-package multiservice
+package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 
@@ -11,5 +14,11 @@ func main() {
 		Timestamp: time.Now(),
 		Location: "Bangalore",
 	}
+
+	fmt.Println(e)
+
+	getUser()
+
+
 
 }

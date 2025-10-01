@@ -1,4 +1,4 @@
-package multiservice
+package main
 
 import "time"
 
