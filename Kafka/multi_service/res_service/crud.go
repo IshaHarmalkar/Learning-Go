@@ -64,7 +64,7 @@ func(r *UserRepository) CreatePass(km KafkaMessage) (KafkaMessage, error) {
 
 
 
-func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, error) {	
+func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, int, error) {	
 	fmt.Println("Checking if duplicate: ", km)
 
     
@@ -80,7 +80,7 @@ func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, error) {
 		
 		case sql.ErrNoRows:
 			fmt.Println("No rows were returned!")
-			return false, nil
+			return false, -1, nil
 		case nil:
 			fmt.Println("passId: ", passId)
 			fmt.Println("user: ", user)
@@ -93,6 +93,35 @@ func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, error) {
 	fmt.Println("printing:", user.Id, user.Uuid)
 
 	
-    return true, nil	
+    return true, passId, nil	
+
+}
+
+func(r *UserRepository) CreateDuplicate(km KafkaMessage, passId int) (KafkaMessage, error) {	
+    
+    fmt.Println("wrtiting to duplicates : ", km)
+	user := km.User
+	event := km.Event
+	uniqId := uuid.Must(uuid.NewRandom()).String()  //uniqId refers to uuid. did not use uuid, as not sure if it would conflcit package name
+	
+	query := "INSERT INTO duplicates (uuid, pass_id, event_id, pass_action, user_id, name, email, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+
+	//execute query 
+	res, err := r.db.Exec(query,uniqId, passId, event.Id, event.Action,user.Id, user.Name, user.Email, user.Role)
+	if err != nil {
+		return km, fmt.Errorf("failed to insert duplicate %s into databse: %w", event.Id, err)
+	}
+
+	duplicateId, err := res.LastInsertId()
+	if err != nil {
+		return km, fmt.Errorf("failed to fetch the duplicate id of the user just created: %w", err)
+	}
+
+	println("duplicate id is:%v",duplicateId)
+
+	fmt.Printf("id :%d, duplicated logged for user %s with event_id %s", duplicateId, user.Name, event.Id)
+
+	
+    return km, nil	
 
 }
