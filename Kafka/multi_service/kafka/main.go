@@ -29,30 +29,26 @@ func main() {
 	retry := 0
 
 
-/* 	var u User
+	var u User
 	var err error
-	var flag int  */
-	u, flag, err := getUser("1", &retry)
+	flag := -1
+	//flag = -1
+	u, flag, err = getUser("1", &retry, &flag)
 	
 
 	for retry < 3 && flag == -1 {
 
-
-		u,flag, err := getUser("1", &retry)
-
-		fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)
 		
-		
-
+		u, flag, err := getUser("1", &retry, &flag)
+		fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)				
+		cacheMutex.Lock()
 		if flag == -1 {
-		    fmt.Println("sleeping for 1 minute before retrying")		
+		    fmt.Println("sleeping for 1 minute before retrying")
+			time.Sleep(1 * time.Minute)	
 
-			time.Sleep(1 * time.Minute)
-			if flag != -1{
-				break
-			}
-
-		}		
+		}	
+		
+	    cacheMutex.Unlock()	
 
 
 	}
