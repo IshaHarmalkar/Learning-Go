@@ -36,6 +36,12 @@ func main() {
 
 	log.Println("Listening for messages..")
 
+
+	db, err := NewUserRepository()
+	if err != nil {
+		log.Fatalf("Failed to iniatize user repository: %v", err)
+	}
+
 	for msg := range partitionConsumer.Messages(){
 
 		var km KafkaMessage
@@ -45,7 +51,15 @@ func main() {
 			continue
 		}
 
-		fmt.Println(km)
+
+		res, err := db.CreatePass(km)
+		if err != nil {
+			log.Panicf("Query failed: ", err)
+		}
+
+		fmt.Println("written to db ", res)
+
+		
 
 
 
