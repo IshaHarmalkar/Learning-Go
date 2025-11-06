@@ -4,28 +4,26 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 func main() {
 
 	//duplicates
-/* 	e := Event{
+ 	e := Event{
 		Id:        "b196824e-a6c4-4b03-bb59-dc68a4a0c068",
 		Action:    "door_open",
 		Timestamp: time.Now(),
 		Location:  "Bangalore",
-	} */
+	} 
 
 	
-		eventId := uuid.Must(uuid.NewRandom()).String()
-		e := Event{
-			Id:         eventId,
-			Action:    "door_open",
-			Timestamp: time.Now(),
-			Location: "Bangalore",
-		}
+	/* eventId := uuid.Must(uuid.NewRandom()).String()
+	e := Event{
+		Id:         eventId,
+		Action:    "door_open",
+		Timestamp: time.Now(),
+		Location: "Bangalore",
+	} */
 
 	
 	
@@ -42,7 +40,7 @@ func main() {
 		fmt.Println("Entered for loop, retry is set to: ", retry, &retry) */		
 
 		u, flag, err = getUser("1", &retry)
-		//fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)				
+		fmt.Printf("Retrying %d with user: %v , flag: %d, and err: %v", retry, u, flag, err)				
 		
 		if flag == -1 {
 		    fmt.Println("sleeping for 1 minute before retrying")

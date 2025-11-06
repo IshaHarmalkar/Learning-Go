@@ -22,7 +22,7 @@ func getUser(userId string, retry *int) (User, int, error) {
 	
 	
 
-	//defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

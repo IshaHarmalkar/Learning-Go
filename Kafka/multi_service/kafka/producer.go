@@ -50,8 +50,6 @@ func sendEvent(e Event, u User)(error) {
 	}
 
 
-
-
 	msg :=  &sarama.ProducerMessage{
 		Topic: "test_event",
 		Value: sarama.ByteEncoder(payload),
@@ -61,5 +59,5 @@ func sendEvent(e Event, u User)(error) {
    fmt.Println("Message Sent")
 
    return nil
-
 }
+

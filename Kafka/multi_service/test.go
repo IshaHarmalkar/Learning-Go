@@ -26,3 +26,28 @@ func main() {
 	fmt.Println(b)
 
 }
+
+
+
+
+
+
+
+
+/* 
+
+
+//user service
+go run main.go user_service.go
+
+
+//res_service
+go run crud.go dto.
+
+
+//kafka
+
+go run dto.go main.go process_event.go producer.go
+
+
+*/
