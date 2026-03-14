@@ -28,9 +28,9 @@ func main() {
 
 	//create a new user
 	user := User{
-		ID: 1,
-		Name: "JOhn Doe",
-		Email: "john.doe@example.com",
+		ID: 6,
+		Name: "Ryan Evon",
+		Email: "ryan@example.com",
 	}
 
 	//serialie the user to json
@@ -51,6 +51,6 @@ func main() {
 		log.Fatalf("Failed to send message: %v", err)
 	}
 
-	fmt.Printf("Message sent to partition %d at offset %f\n", partition, offset)
+	fmt.Printf("Message sent to partition %d at offset %d\n", partition, offset)
 
 }

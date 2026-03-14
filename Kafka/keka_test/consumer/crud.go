@@ -1,0 +1,118 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/google/uuid"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+type UserRepository struct {
+	db *sql.DB
+}
+
+func NewUserRepository() (*UserRepository, error) {
+	dsn := "root:@tcp(127.0.0.1:3306)/mutl_service"
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database connecction: %w", err)
+	}
+
+	//fmt.Println("Inside new user repo fn")
+
+	//pinng the db to ensure the connection is live
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	//fmt.Println("db pointer returnerd")
+
+	return &UserRepository{db: db}, nil
+
+}
+
+func(r *UserRepository) CreatePass(km KafkaMessage) (KafkaMessage, error) {	
+    
+    fmt.Println("starting create pass: ", km)
+	event := km.Event
+	uniqId := uuid.Must(uuid.NewRandom()).String()  //uniqId refers to uuid. did not use uuid, as not sure if it would conflcit package name
+	
+	query := "INSERT INTO pass (uuid, event_id, pass_action, user_id, name, email, role) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+	//execute query 
+	res, err := r.db.Exec(query,uniqId, event.Id, event.Action)
+	if err != nil {
+		return km, fmt.Errorf("failed to insert swipe into databse: %w",err)
+	}
+
+	passId, err := res.LastInsertId()
+	if err != nil {
+		return km, fmt.Errorf("failed to fetch the user id of the user just created: %w", err)
+	}
+
+	println("pass id is:%v",passId)
+
+	fmt.Printf("id :%d, pass logged for  with event_id %s", passId, event.Id)
+
+	
+    return km, nil	
+
+}
+
+
+
+func(r *UserRepository) checkDuplicate(km KafkaMessage) (bool, int, error) {	
+	fmt.Println("Checking if duplicate: ", km)
+
+    
+    eventId := km.Event.Id	
+	event := km.Event
+
+    var passId int	
+
+	query :="SELECT id, pass_action, user_id, name, email, role FROM pass WHERE event_id = ?"
+	row := r.db.QueryRow(query, eventId)
+	switch err := row.Scan(&passId, &event.Action); err {
+		
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+			return false, -1, nil
+		case nil:
+			fmt.Println("passId: ", passId)
+			fmt.Println("event: ", event)
+		default:
+			panic(err)
+
+	}
+	
+    return true, passId, nil	
+
+}
+
+func(r *UserRepository) CreateDuplicate(km KafkaMessage, passId int) (KafkaMessage, error) {	
+    
+    fmt.Println("wrtiting to duplicates : ", km)
+	event := km.Event
+	uniqId := uuid.Must(uuid.NewRandom()).String()  //uniqId refers to uuid. did not use uuid, as not sure if it would conflcit package name
+	
+	query := "INSERT INTO duplicates (uuid, pass_id, event_id, pass_action, user_id, name, email, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+
+	//execute query 
+	res, err := r.db.Exec(query,uniqId, passId, event.Id, event.Action)
+	if err != nil {
+		return km, fmt.Errorf("failed to insert duplicate %s into databse: %w", event.Id, err)
+	}
+
+	duplicateId, err := res.LastInsertId()
+	if err != nil {
+		return km, fmt.Errorf("failed to fetch the duplicate id of the user just created: %w", err)
+	}
+
+	println("duplicate id is:%v",duplicateId)
+
+	
+    return km, nil	
+
+}

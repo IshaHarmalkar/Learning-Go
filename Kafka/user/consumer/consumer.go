@@ -44,6 +44,8 @@ func main() {
 	defer consumer.Close()
 
 	//subsrice to the usr creations topic
+
+	//partition consumer profides Messages channel and Errors channel.
 	partitionConsumer, err := consumer.ConsumePartition("user_creations", 0, sarama.OffsetOldest)
 	if err != nil{
 		log.Fatalf("Failed to consume partition: %v", err)
@@ -57,10 +59,14 @@ func main() {
 
 	//start consuming message
 	doneCh := make(chan struct{})
+
+	//this is a go routine -> thread
 	go func(){
 		for{
 
 			select{
+			//new msg from kafka
+			//partitionConsumer.Messages() is a channel of messages.
 			case msg := <-partitionConsumer.Messages():
 				//deserialize the message value (json) into a user struct
 				var user User
@@ -74,9 +80,11 @@ func main() {
 					log.Printf("Failed to create user in databse : %v", err)
 				}
 
+			//error from kafka
 			case err := <-partitionConsumer.Errors():
 				log.Panicf("Error from consumer: %v", err)
 
+			//shutdown signal -> ctr + C 
 			case <-signals:
 				fmt.Println("Shutting down consumer...")
 				close(doneCh)
@@ -90,3 +98,14 @@ func main() {
 
 
 }
+
+
+/* are go routines mostly processing some chanels?
+	can channels be thought of as a stream that's constantly flooded with data?
+	Is this process correct?
+	1.Something is constantly happening
+	2.we catch the said thing in a channel to be processed.const
+	3. For each thing instnce usually a go routine is published
+	4. the go routine will do it's logic and return something [or not] and the return thing
+	will fall back into some other channel again or be caught in aother chanenl.const
+*/
